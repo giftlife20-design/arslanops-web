@@ -1,12 +1,13 @@
 /**
  * Türkçe karakter destekli font yükleyici (jsPDF için)
- * Roboto fontunu /public/fonts/ dizininden yükler
+ * Roboto Variable fontunu /public/fonts/ dizininden yükler
  */
 
 export async function loadTurkishFont(doc: any): Promise<boolean> {
     try {
         const toBase64 = async (url: string): Promise<string> => {
             const res = await fetch(url);
+            if (!res.ok) throw new Error(`Font fetch failed: ${res.status}`);
             const buf = await res.arrayBuffer();
             const bytes = new Uint8Array(buf);
             let binary = '';
@@ -17,16 +18,11 @@ export async function loadTurkishFont(doc: any): Promise<boolean> {
             return btoa(binary);
         };
 
-        const [regularB64, boldB64] = await Promise.all([
-            toBase64('/fonts/Roboto-Regular.ttf'),
-            toBase64('/fonts/Roboto-Bold.ttf'),
-        ]);
+        const b64 = await toBase64('/fonts/Roboto-Variable.ttf');
 
-        doc.addFileToVFS('Roboto-Regular.ttf', regularB64);
-        doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
-
-        doc.addFileToVFS('Roboto-Bold.ttf', boldB64);
-        doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
+        doc.addFileToVFS('Roboto-Variable.ttf', b64);
+        doc.addFont('Roboto-Variable.ttf', 'Roboto', 'normal');
+        doc.addFont('Roboto-Variable.ttf', 'Roboto', 'bold');
 
         doc.setFont('Roboto');
         return true;

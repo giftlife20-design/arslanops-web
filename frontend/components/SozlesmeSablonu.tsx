@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FileText, Download, Building2, Phone, Shield, Calendar, Loader2, Scale, Lock } from 'lucide-react';
+import { FileText, Download, Building2, Phone, Shield, Calendar, Loader2, Scale, Lock, Package } from 'lucide-react';
 import { loadTurkishFont } from '../utils/pdfFontLoader';
 
 /* ------------------------------------------------------------------ */
@@ -30,6 +30,8 @@ interface SozlesmeData {
     baslangic_tarihi: string;
     bitis_tarihi: string;
     sure: string;
+    // Paket
+    secili_paket: string;
     // Hizmet Kapsamı
     hizmet_kapsami: string;
     // Ödeme
@@ -41,6 +43,57 @@ interface SozlesmeData {
     gizlilik_suresi: string;
     cezai_sart: string;
 }
+
+interface PaketBilgi {
+    name: string;
+    sure: string;
+    features: string[];
+    description: string;
+}
+
+const PAKETLER: PaketBilgi[] = [
+    {
+        name: 'Temel',
+        sure: '30 gün',
+        description: 'Hızlı Teşhis + 30 Gün Planı',
+        features: [
+            'Mevcut durum özeti (PDF)',
+            'Fire/ikram kontrol noktaları',
+            '30 gün aksiyon listesi (Excel)',
+            'Kontrol listesi seti',
+            '1 saat online görüşme'
+        ]
+    },
+    {
+        name: 'Standart',
+        sure: '60 gün',
+        description: 'Maliyet & Operasyon Kurulumu',
+        features: [
+            'Detaylı analiz raporu (PDF)',
+            '30/60/90 gün aksiyon planı (Excel)',
+            'SOP dokümanları',
+            'Haftalık KPI takibi',
+            'Kontrol listeleri',
+            '60 gün uygulama desteği',
+            'Haftalık takip görüşmeleri'
+        ]
+    },
+    {
+        name: 'Pro',
+        sure: '90 gün',
+        description: 'Uygulamalı Dönüşüm + Takip',
+        features: [
+            'Standart paketteki her şey',
+            'Yerinde ziyaret ve denetim',
+            'Ekip eğitimleri (yerinde)',
+            '90 gün tam destek',
+            'Tedarikçi müzakereleri',
+            'Aylık performans raporu',
+            'KPI Dashboard (Excel)',
+            '7/24 WhatsApp destek'
+        ]
+    }
+];
 
 type SozlesmeTipi = 'hizmet' | 'gizlilik';
 
@@ -63,25 +116,14 @@ const INITIAL: SozlesmeData = {
     sozlesme_tarihi: new Date().toISOString().split('T')[0],
     baslangic_tarihi: '',
     bitis_tarihi: '',
-    sure: '3 ay',
-    hizmet_kapsami: `1. Operasyonel Analiz & Durum Tespiti
-  - Isletme ziyareti, gozlem, mevcut durum analizi
-  - SWOT analizi ve risk degerlendirmesi
-
-2. Sistem Kurulumu & Iyilestirme
-  - Stok takip ve satin alma surecleri
-  - Kasa yonetimi ve mali kontrol
-  - Personel verimlilik analizi
-
-3. Raporlama & Takip
-  - Haftalik ilerleme raporu
-  - KPI dashboard kurulumu
-  - Aksiyon plani ve kontrol listeleri`,
+    sure: '',
+    secili_paket: '',
+    hizmet_kapsami: '',
     toplam_ucret: '',
     pesin_oran: '50',
     kalan_oran: '50',
-    odeme_notu: 'Sozlesme imzalandiginda toplam ucretin %50\'si pesin odenir. Kalan %50 hizmet tamamlandiginda odenir.',
-    gizlilik_suresi: '2 yil',
+    odeme_notu: 'Sözleşme imzalandığında toplam ücretin %50\'si peşin ödenir. Kalan %50 hizmet tamamlandığında ödenir.',
+    gizlilik_suresi: '2 yıl',
     cezai_sart: '50000',
 };
 
@@ -214,11 +256,13 @@ async function generateHizmetSozlesmesi(data: SozlesmeData) {
 
     // ---- MADDE 2: KONU ----
     sectionTitle('MADDE 2 - SÖZLEŞMENİN KONUSU');
-    addParagraph('Bu sözleşme, Danışman\'ın Müşteri\'ye aşağıda belirtilen danışmanlık hizmetlerini vermesine ilişkin tarafların hak ve yükümlülüklerini düzenlemektedir.');
+    const paketAdi = data.secili_paket ? ` ("${data.secili_paket}" Paketi kapsamında)` : '';
+    addParagraph(`Bu sözleşme, Danışman'ın Müşteri'ye aşağıda belirtilen danışmanlık hizmetlerini${paketAdi} vermesine ilişkin tarafların hak ve yükümlülüklerini düzenlemektedir.`);
 
     // ---- MADDE 3: HİZMET KAPSAMI ----
-    sectionTitle('MADDE 3 - HİZMET KAPSAMI');
-    addParagraph(data.hizmet_kapsami);
+    sectionTitle('MADDE 3 - HİZMET KAPSAMI' + (data.secili_paket ? ` (${data.secili_paket} Paketi)` : ''));
+    addParagraph(data.hizmet_kapsami || '(Hizmet kapsamı belirlenmedi)');
+
 
     // ---- MADDE 4: SÜRE ----
     sectionTitle('MADDE 4 - SÖZLEŞME SÜRESİ');
@@ -552,6 +596,18 @@ export default function SozlesmeSablonu() {
 
     const update = (field: keyof SozlesmeData, value: string) => setData(prev => ({ ...prev, [field]: value }));
 
+    const handlePaketSec = (paketName: string) => {
+        const paket = PAKETLER.find(p => p.name === paketName);
+        if (!paket) return;
+        const kapsam = `${paket.name} Paketi - ${paket.description}\n\nİçerikler:\n${paket.features.map((f, i) => `${i + 1}. ${f}`).join('\n')}`;
+        setData(prev => ({
+            ...prev,
+            secili_paket: paketName,
+            sure: paket.sure,
+            hizmet_kapsami: kapsam,
+        }));
+    };
+
     const handleGenerate = async () => {
         setGenerating(true);
         try {
@@ -651,6 +707,36 @@ export default function SozlesmeSablonu() {
             {/* Hizmet Sözleşmesine Özel */}
             {tip === 'hizmet' && (
                 <>
+                    {/* Paket Seçimi */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                        <h3 className="text-sm font-bold text-[#0B1F3B] flex items-center gap-2">
+                            <Package className="w-4 h-4 text-[#C4803D]" /> Paket Seçimi
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            {PAKETLER.map(paket => (
+                                <button
+                                    key={paket.name}
+                                    onClick={() => handlePaketSec(paket.name)}
+                                    className={`text-left p-4 rounded-xl border-2 transition-all ${data.secili_paket === paket.name
+                                        ? 'border-[#C4803D] bg-[#C4803D]/5 ring-1 ring-[#C4803D]/20'
+                                        : 'border-gray-200 hover:border-gray-300'
+                                        }`}
+                                >
+                                    <div className="font-bold text-sm text-[#0B1F3B]">{paket.name}</div>
+                                    <div className="text-xs text-gray-500 mt-0.5">{paket.description}</div>
+                                    <div className="text-xs text-[#C4803D] font-medium mt-1">{paket.sure}</div>
+                                    <ul className="mt-2 space-y-0.5">
+                                        {paket.features.slice(0, 4).map((f, i) => (
+                                            <li key={i} className="text-[11px] text-gray-500">• {f}</li>
+                                        ))}
+                                        {paket.features.length > 4 && (
+                                            <li className="text-[11px] text-gray-400">+{paket.features.length - 4} daha...</li>
+                                        )}
+                                    </ul>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
                         <h3 className="text-sm font-bold text-[#0B1F3B] flex items-center gap-2">
                             <Shield className="w-4 h-4 text-[#C4803D]" /> Hizmet Kapsamı
