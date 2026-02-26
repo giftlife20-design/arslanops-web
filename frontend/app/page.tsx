@@ -14,6 +14,7 @@ import FAQ from '@/components/FAQ';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import BackToTop from '@/components/BackToTop';
+import TrustSection from '@/components/TrustSection';
 
 export default function Home() {
   return (
@@ -27,6 +28,7 @@ export default function Home() {
       <Deliverables />
       <Portfolio />
       <Testimonials />
+      <TrustSection />
       <LogoMarquee />
       <Packages />
       <About />
