@@ -10,12 +10,6 @@ import {
 /* ── 1 · Garanti Rozetleri ── */
 const GUARANTEES = [
     {
-        icon: ShieldCheck,
-        title: 'Memnuniyet Garantisi',
-        desc: 'İlk 7 gün içinde memnun kalmazsanız, ödemeniz iade edilir — soru sorulmaz.',
-        color: 'from-emerald-500 to-emerald-600',
-    },
-    {
         icon: FileCheck2,
         title: 'Sözleşme Güvencesi',
         desc: 'Tüm hizmetler yazılı sözleşmeye bağlıdır. Hak ve yükümlülükler net tanımlanır.',
@@ -26,6 +20,12 @@ const GUARANTEES = [
         title: 'Gizlilik (NDA)',
         desc: 'İşletme bilgileriniz NDA ile korunur. Verileriniz 3. şahıslarla asla paylaşılmaz.',
         color: 'from-purple-500 to-purple-600',
+    },
+    {
+        icon: Handshake,
+        title: 'Sonuç Odaklı Çalışma',
+        desc: 'Ölçülebilir hedefler belirlenir, ilerleme haftalık raporlarla takip edilir.',
+        color: 'from-emerald-500 to-emerald-600',
     },
 ];
 
