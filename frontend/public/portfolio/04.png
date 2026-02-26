@@ -1,0 +1,89 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: 'Inter', Arial, sans-serif; font-weight: 700; fill: #0B1F3B; }
+      .box-label { font-family: 'Inter', Arial, sans-serif; font-weight: 600; fill: #FFFFFF; }
+      .control { font-family: 'Inter', Arial, sans-serif; font-weight: 400; fill: #2B2F36; font-size: 10px; }
+    </style>
+  </defs>
+  
+  <rect width="800" height="600" fill="#F5F7FA"/>
+  
+  <!-- Başlık -->
+  <text x="400" y="50" class="title" font-size="22" text-anchor="middle">Kasa–Depo–Satın Alma Süreç Haritası</text>
+  
+  <!-- Process flow -->
+  <g>
+    <!-- Satın Alma -->
+    <rect x="100" y="120" width="140" height="80" fill="#0B1F3B" rx="8"/>
+    <text x="170" y="165" class="box-label" font-size="16" text-anchor="middle">Satın Alma</text>
+    
+    <!-- Arrow 1 -->
+    <line x1="240" y1="160" x2="300" y2="160" stroke="#B8743A" stroke-width="4"/>
+    <polygon points="300,160 290,155 290,165" fill="#B8743A"/>
+    
+    <!-- Depo -->
+    <rect x="320" y="120" width="140" height="80" fill="#0B1F3B" rx="8"/>
+    <text x="390" y="165" class="box-label" font-size="16" text-anchor="middle">Depo</text>
+    
+    <!-- Arrow 2 -->
+    <line x1="460" y1="160" x2="520" y2="160" stroke="#B8743A" stroke-width="4"/>
+    <polygon points="520,160 510,155 510,165" fill="#B8743A"/>
+    
+    <!-- Üretim -->
+    <rect x="540" y="120" width="140" height="80" fill="#0B1F3B" rx="8"/>
+    <text x="610" y="165" class="box-label" font-size="16" text-anchor="middle">Üretim</text>
+    
+    <!-- Arrow down -->
+    <line x1="610" y1="200" x2="610" y2="260" stroke="#B8743A" stroke-width="4"/>
+    <polygon points="610,260 605,250 615,250" fill="#B8743A"/>
+    
+    <!-- Kasa -->
+    <rect x="540" y="280" width="140" height="80" fill="#0B1F3B" rx="8"/>
+    <text x="610" y="325" class="box-label" font-size="16" text-anchor="middle">Kasa</text>
+    
+    <!-- Arrow left -->
+    <line x1="540" y1="320" x2="480" y2="320" stroke="#B8743A" stroke-width="4"/>
+    <polygon points="480,320 490,315 490,325" fill="#B8743A"/>
+    
+    <!-- Raporlama -->
+    <rect x="320" y="280" width="140" height="80" fill="#0B1F3B" rx="8"/>
+    <text x="390" y="325" class="box-label" font-size="16" text-anchor="middle">Raporlama</text>
+    
+    <!-- Arrow back to start (feedback loop) -->
+    <path d="M 320 320 Q 210 320 210 200" stroke="#B8743A" stroke-width="3" stroke-dasharray="5,5" fill="none"/>
+    <polygon points="210,200 205,210 215,210" fill="#B8743A"/>
+  </g>
+  
+  <!-- Control Points -->
+  <g>
+    <circle cx="170" cy="230" r="8" fill="#B8743A"/>
+    <rect x="120" y="245" width="100" height="50" fill="white" rx="4" stroke="#0B1F3B" stroke-width="1"/>
+    <text x="170" y="260" class="control" text-anchor="middle" font-weight="600">Kontrol 1</text>
+    <text x="170" y="273" class="control" text-anchor="middle">Fiyat onayı</text>
+    <text x="170" y="286" class="control" text-anchor="middle">Kalite kontrolü</text>
+    
+    <circle cx="390" cy="230" r="8" fill="#B8743A"/>
+    <rect x="340" y="245" width="100" height="50" fill="white" rx="4" stroke="#0B1F3B" stroke-width="1"/>
+    <text x="390" y="260" class="control" text-anchor="middle" font-weight="600">Kontrol 2</text>
+    <text x="390" y="273" class="control" text-anchor="middle">Stok sayımı</text>
+    <text x="390" y="286" class="control" text-anchor="middle">Fire kontrolü</text>
+    
+    <circle cx="610" cy="395" r="8" fill="#B8743A"/>
+    <rect x="560" y="410" width="100" height="50" fill="white" rx="4" stroke="#0B1F3B" stroke-width="1"/>
+    <text x="610" y="425" class="control" text-anchor="middle" font-weight="600">Kontrol 3</text>
+    <text x="610" y="438" class="control" text-anchor="middle">Satış kaydı</text>
+    <text x="610" y="451" class="control" text-anchor="middle">Kasa sayımı</text>
+  </g>
+  
+  <!-- Legend -->
+  <g>
+    <text x="50" y="520" class="control" font-weight="600">Süreç Akışı:</text>
+    <line x1="50" y1="535" x2="100" y2="535" stroke="#B8743A" stroke-width="3"/>
+    <polygon points="100,535 90,530 90,540" fill="#B8743A"/>
+    
+    <text x="180" y="520" class="control" font-weight="600">Geri Bildirim:</text>
+    <line x1="180" y1="535" x2="230" y2="535" stroke="#B8743A" stroke-width="3" stroke-dasharray="5,5"/>
+    <polygon points="230,535 220,530 220,540" fill="#B8743A"/>
+  </g>
+</svg>

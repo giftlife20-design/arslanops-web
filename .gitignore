@@ -1,0 +1,27 @@
+# Backend
+backend/__pycache__/
+backend/*.pyc
+backend/leads.db
+backend/venv/
+backend/.env
+backend/reports.json
+backend/uploads/
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env*.local
+
+# Backup
+backup_before_redesign/
+reeee/
+
+# IDE
+.vscode/
+.idea/
+.agent/
+
+# OS
+.DS_Store
+Thumbs.db

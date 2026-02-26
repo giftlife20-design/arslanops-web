@@ -1,0 +1,323 @@
+{
+  "branding": {
+    "logo_url": "",
+    "logo_text": "ArslanOps",
+    "favicon_url": ""
+  },
+  "hero": {
+    "badge": "Coffee & Restoran Operasyon Danışmanlığı",
+    "title_prefix": "İşletmenizde",
+    "rotating_words": [
+      "Kar Artışı",
+      "Maliyet Kontrolü",
+      "Operasyon Düzeni",
+      "Sürdürülebilir Başarı"
+    ],
+    "description": "25+ yıllık saha deneyimiyle stok, satın alma, kasa akışınızı toplar ve takip edilebilir sistem kurarım.",
+    "cta_primary": "Ücretsiz Ön Görüşme",
+    "cta_secondary": "Hizmetleri İncele",
+    "bg_type": "video",
+    "bg_color": "#0B1F3B",
+    "bg_gradient_from": "#0B1F3B",
+    "bg_gradient_to": "#2026d5",
+    "bg_image_url": "",
+    "bg_video_url": "/uploads/hero/e15a6aa59650.mp4",
+    "bg_overlay_opacity": 0.05,
+    "bg_overlay_color": "#000000"
+  },
+  "stats": [
+    {
+      "value": 25,
+      "suffix": "+",
+      "label": "Yıllık Sektör Tecrübesi",
+      "description": "Coffee ve restoran sektöründe operasyon ve danışmanlık alanında kanıtlanmış deneyim"
+    },
+    {
+      "value": 25,
+      "suffix": "+",
+      "label": "Tamamlanan Proje",
+      "description": "Yeni açılışlardan mevcut işletme iyileştirmelerine kadar geniş portföy"
+    },
+    {
+      "value": 30,
+      "prefix": "%",
+      "suffix": "+",
+      "label": "Ortalama Maliyet İyileştirmesi",
+      "description": "Fire kontrolü ve süreç optimizasyonu ile sağlanan tipik kazanç"
+    },
+    {
+      "value": 90,
+      "suffix": "",
+      "label": "Gün İçinde Çözüm",
+      "description": "Hızlı teşhis ve aşamalı uygulama modeli ile sonuç odaklı yaklaşım"
+    }
+  ],
+  "services": [
+    {
+      "title": "Maliyet & COGS Kontrolü",
+      "description": "Yiyecek-içecek maliyetlerinizi kategori bazında analiz eder, fire ve sapma noktalarını tespit ederim.",
+      "highlights": [
+        "COGS Analizi",
+        "Fire Kontrolü",
+        "Sapma Tespiti"
+      ]
+    },
+    {
+      "title": "Stok & Depo Yönetimi",
+      "description": "Depo düzeni, stok sayım sistematiği ve minimum/maksimum stok seviyelerini belirlerim.",
+      "highlights": [
+        "Depo Düzeni",
+        "Sayım Sistemi",
+        "Min/Max Stok"
+      ]
+    },
+    {
+      "title": "Operasyon & Süreç Düzeni",
+      "description": "Günlük açılış-kapanış prosedürleri, vardiya devir teslim ve kontrol listelerini oluştururum.",
+      "highlights": [
+        "SOP Hazırlama",
+        "Kontrol Listeleri",
+        "Vardiya Yönetimi"
+      ]
+    },
+    {
+      "title": "Yeni Açılış Danışmanlığı",
+      "description": "Sıfırdan işletme kurulumunda menü mühendisliğinden ekip yapılanmasına kadar destek sağlarım.",
+      "highlights": [
+        "Menü Planlama",
+        "Ekip Kurma",
+        "Sistem Kurulumu"
+      ]
+    },
+    {
+      "title": "Satın Alma Optimizasyonu",
+      "description": "Tedarikçi değerlendirme, fiyat karşılaştırma ve satın alma süreçlerinizi optimize ederim.",
+      "highlights": [
+        "Tedarikçi Analizi",
+        "Fiyat Optimizasyonu",
+        "Sipariş Sistemi"
+      ]
+    },
+    {
+      "title": "Ekip Eğitimi",
+      "description": "Operasyon standartları, hijyen kuralları ve müşteri hizmetleri konusunda ekip eğitimleri düzenlerim.",
+      "highlights": [
+        "Operasyon Eğitimi",
+        "Hijyen Standartları",
+        "Müşteri Deneyimi"
+      ]
+    }
+  ],
+  "testimonials_visible": false,
+  "testimonials": [
+    {
+      "name": "Mehmet K.",
+      "role": "Coffee Shop Sahibi",
+      "location": "İstanbul",
+      "content": "İlhan Bey ile çalışmaya başladıktan 60 gün sonra COGS oranımız %38'den %27'ye düştü. Fire kontrol sistemi sayesinde aylık 15.000 TL tasarruf sağladık. Kurduğu SOP ve kontrol listeleri hâlâ kullanıyoruz.",
+      "rating": 5,
+      "highlight": "%30 maliyet düşüşü",
+      "avatar_url": "/uploads/testimonials/b0ab809919b5.png"
+    },
+    {
+      "name": "Ayşe T.",
+      "role": "Restoran İşletmecisi",
+      "location": "Ankara",
+      "content": "Yeni açılışımızda sıfırdan sistem kurulmasını sağladı. Kontrol listeleri ve süreç akışları sayesinde ilk günden profesyonel bir işleyiş oturduk. 6 ay sonra hâlâ aynı düzenle çalışıyoruz — sistem kalıcı oldu.",
+      "rating": 5,
+      "highlight": "Sıfırdan kalıcı sistem kurulumu",
+      "avatar_url": "/uploads/testimonials/9b18610febbf.jpeg"
+    },
+    {
+      "name": "Emre D.",
+      "role": "Franchise Yöneticisi",
+      "location": "İzmir",
+      "content": "Üç şubemizde standart operasyon prosedürleri oluşturdu. Artık her şubede aynı kalite ve kontrol sistemiyle çalışıyoruz. Haftalık KPI raporları sayesinde sorunları erkenden yakalıyoruz.",
+      "rating": 5,
+      "highlight": "3 şubede standart sistem",
+      "avatar_url": "/uploads/testimonials/568e7b2f0a2b.png"
+    },
+    {
+      "name": "Fatma S.",
+      "role": "Kafe & Pastane Sahibi",
+      "location": "Bursa",
+      "content": "Stok sayımlarında her ay eksik çıkıyordu ama sebebini bulamıyorduk. İlhan Bey kontrol noktalarını belirledikten sonra kayıplar neredeyse sıfıra indi. Teslim ettiği Excel takip dosyasını her gün kullanıyoruz.",
+      "rating": 5,
+      "highlight": "Stok kayıpları %95 azaldı",
+      "avatar_url": ""
+    }
+  ],
+  "packages": [
+    {
+      "name": "Temel",
+      "description": "Hızlı Teşhis + 30 Gün Planı",
+      "features": [
+        "Mevcut durum özeti (PDF)",
+        "Fire/ikram kontrol noktaları",
+        "30 gün aksiyon listesi (Excel)",
+        "Kontrol listesi seti",
+        "1 saat online görüşme"
+      ],
+      "recommended": false
+    },
+    {
+      "name": "Standart",
+      "description": "Maliyet & Operasyon Kurulumu",
+      "features": [
+        "Detaylı analiz raporu (PDF)",
+        "30/60/90 gün aksiyon planı (Excel)",
+        "SOP dokümanları",
+        "Haftalık KPI takibi",
+        "Kontrol listeleri",
+        "60 gün uygulama desteği",
+        "Haftalık takip görüşmeleri"
+      ],
+      "recommended": true
+    },
+    {
+      "name": "Pro",
+      "description": "Uygulamalı Dönüşüm + Takip",
+      "features": [
+        "Standart paketteki her şey",
+        "Yerinde ziyaret ve denetim",
+        "Ekip eğitimleri (yerinde)",
+        "90 gün tam destek",
+        "Tedarikçi müzakereleri",
+        "Aylık performans raporu",
+        "KPI Dashboard (Excel)",
+        "7/24 WhatsApp destek"
+      ],
+      "recommended": false
+    }
+  ],
+  "faq": [
+    {
+      "question": "Yeni açılan bir işletme için de danışmanlık veriyor musunuz?",
+      "answer": "Evet, yeni açılış danışmanlığı en güçlü alanlarımdan biri. Menü planlamasından ekip kurulumuna, operasyon sistemi tasarımından tedarikçi seçimine kadar sıfırdan profesyonel bir yapı kurmanıza yardımcı oluyorum."
+    },
+    {
+      "question": "COGS nedir ve neden önemlidir?",
+      "answer": "COGS (Cost of Goods Sold), satılan malın maliyetidir. Bir restoran veya kafenin karlılığını doğrudan etkileyen en kritik metriktir. İdeal COGS oranı sektöre göre %25-35 arasında olmalıdır."
+    },
+    {
+      "question": "Danışmanlık süreci nasıl işliyor?",
+      "answer": "İlk olarak ücretsiz bir ön görüşme yapıyoruz. Ardından işletmenizin mevcut durumunu analiz ediyorum. Tespit edilen sorunlara göre özelleştirilmiş bir aksiyon planı hazırlıyorum ve uygulama sürecinde yanınızda oluyorum."
+    },
+    {
+      "question": "Sonuç ne kadar sürede alınır?",
+      "answer": "İlk somut sonuçlar genellikle 30 gün içinde görülmeye başlar. 60-90 gün içinde sistemler oturur ve sürdürülebilir bir yapıya kavuşursunuz."
+    },
+    {
+      "question": "Yatırımın geri dönüşü ne kadar sürede olur?",
+      "answer": "Danışmanlık yatırımı genellikle ilk 2-3 ay içinde maliyet tasarruflarıyla geri kazanılır. Sektör tecrübemize dayanarak %20-30 maliyet iyileştirmesi hedefliyoruz."
+    },
+    {
+      "question": "Danışmanlık sonunda elimde somut ne kalacak?",
+      "answer": "Her pakette elinize geçecek teslimatlar net olarak belirlenmiştir: Durum Özeti PDF, Aksiyon Planı Excel, SOP dokümanları, kontrol listeleri ve KPI takip dosyaları. Sadece konuşma değil, kalıcı ve kullanılabilir dokümanlar teslim ediyoruz."
+    },
+    {
+      "question": "Danışman gittikten sonra eski düzene dönmez miyiz?",
+      "answer": "Bu en yaygın endişelerden biri ve biz bunu çözmek için çalışıyoruz. Kurduğumuz SOP (Standart Operasyon Prosedürleri), kontrol listeleri ve takip sistemleri ekibinizle birlikte sahada test edilir. Ayrıca eğitim dokümanları sayesinde yeni personel de aynı standartlarda çalışmaya devam eder."
+    },
+    {
+      "question": "Sonuçlar nasıl ölçülüyor? Gerçekten fark oluyor mu?",
+      "answer": "Her projenin başında mevcut KPI'larınızı (COGS oranı, fire yüzdesi, kasa açığı vb.) kayıt altına alıyoruz. Süreç boyunca bu metrikleri haftalık takip ediyor, proje sonunda öncesi-sonrası karşılaştırma raporu sunuyoruz. Hedefimiz %20-30 maliyet iyileştirmesi sağlamak."
+    },
+    {
+      "question": "İletişim süreci nasıl yürütülüyor? Ulaşabilir misiniz?",
+      "answer": "Paketinize göre haftalık online görüşmeler, e-posta ile ilerleme raporları ve WhatsApp üzerinden anlık iletişim sunuyoruz. Pro pakette 7/24 WhatsApp desteği bulunur. Hiçbir müşterimiz 'danışmanıma ulaşamıyorum' demez — bu bizim temel prensibimizdir."
+    }
+  ],
+  "about": {
+    "name": "İlhan Arslan",
+    "title": "Coffee & Restoran Operasyon Danışmanı",
+    "bio": "1999'dan bu yana yiyecek-içecek sektöründe her kademede çalıştım — McDonald's'ta ekip üyesinden denetim müdürlüğüne, restoran işletme müdürlüğünden franchise satın alma yönetimine. 25+ yılda edindiğim saha deneyimini şimdi danışmanlık hizmetine dönüştürüyorum.",
+    "methodology": [
+      {
+        "step": 1,
+        "title": "Teşhis",
+        "description": "Mevcut durumu analiz eder, sorun noktalarını tespit ederim."
+      },
+      {
+        "step": 2,
+        "title": "Düzenleme",
+        "description": "Süreçleri yeniden tasarlar, SOP ve kontrol listeleri oluştururum."
+      },
+      {
+        "step": 3,
+        "title": "Uygulama",
+        "description": "Ekiplerle birlikte sahada uygulama yapar, eğitimler düzenlerim."
+      },
+      {
+        "step": 4,
+        "title": "İyileştirme",
+        "description": "Sonuçları takip eder, sürekli iyileştirme döngüsü kurarım."
+      }
+    ]
+  },
+  "logo_clients_visible": false,
+  "logo_clients": [
+    {
+      "name": "Lezzet Durağı",
+      "logo_url": "/uploads/logos/e6aea4f36f56.png",
+      "enabled": true
+    },
+    {
+      "name": "Cafe Noir",
+      "logo_url": "",
+      "enabled": true
+    },
+    {
+      "name": "Osmanlı Sofrası",
+      "logo_url": "",
+      "enabled": true
+    },
+    {
+      "name": "MOC Coffee",
+      "logo_url": "",
+      "enabled": true
+    },
+    {
+      "name": "Dem'li Bahçe",
+      "logo_url": "",
+      "enabled": true
+    },
+    {
+      "name": "Karadeniz Pide",
+      "logo_url": "",
+      "enabled": true
+    },
+    {
+      "name": "Urban Kitchen",
+      "logo_url": "",
+      "enabled": true
+    },
+    {
+      "name": "Taş Fırın",
+      "logo_url": "",
+      "enabled": true
+    }
+  ],
+  "team": {
+    "founder": {
+      "name": "İlhan Arslan",
+      "title": "Kurucu & Baş Danışman",
+      "photo_url": "/uploads/team/140ab4b81b30.png",
+      "bio": "Restoran ve kafe sektöründe 25+ yıldır sahada çalışıyorum. McDonald's'ta tabandan başlayıp yöneticiliğe yükseldim, ardından franchise zincirlerde satın alma ve operasyon yönetimi deneyimi kazandım. Şimdi bu birikimi bağımsız işletmelere aktarıyorum.",
+      "bio2": "Amacım danışmanlık jargonu değil; uygulanabilir kontrol listeleri, gerçekçi süreç akışı ve net aksiyon planıyla sisteminizi kurmak. Yeni açılışlarda sağlam temel, mevcut işletmelerde kaçakları kapatıp kârlılığı artırmak için çalışırım."
+    },
+    "members": []
+  },
+  "footer": {
+    "email": "info@arslanops.com",
+    "whatsapp": "+905392331474",
+    "phone_display": "+90 539 233 1 474",
+    "instagram": "https://www.instagram.com/arslanops",
+    "linkedin": "https://www.linkedin.com/comm/mynetwork/discovery-see-all?usecase=PEOPLE_FOLLOWS&followMember=ilhan-a-ab0ab7254",
+    "location": "Türkiye genelinde hizmet",
+    "address": "",
+    "maps_embed_url": "",
+    "cta_title": "İşletmenizi Bir Üst Seviyeye Taşıyalım",
+    "cta_description": "Ücretsiz ön değerlendirme için hemen iletişime geçin"
+  }
+}
