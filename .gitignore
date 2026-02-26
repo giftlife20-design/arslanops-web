@@ -5,9 +5,14 @@ backend/leads.db
 backend/venv/
 backend/.env
 backend/reports.json
-# Uploads - include hero assets for production
+# Uploads - include public assets for production
 backend/uploads/*
 !backend/uploads/hero/
+!backend/uploads/team/
+!backend/uploads/logo/
+!backend/uploads/logos/
+!backend/uploads/testimonials/
+
 
 # Frontend
 frontend/node_modules/
