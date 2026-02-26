@@ -7,7 +7,7 @@ import {
     MessageSquare, Package, HelpCircle, UserCircle, Globe,
     Save, Plus, Trash2, GripVertical, Star, ChevronRight,
     Quote, Settings, Eye, Upload, Image, Video, Palette,
-    Paintbrush, X, ClipboardList, BookOpen, CreditCard
+    Paintbrush, X, ClipboardList, BookOpen, CreditCard, Server, ExternalLink, Copy, Check
 } from 'lucide-react';
 import Link from 'next/link';
 import DurumOzetiForm from '../../components/DurumOzetiPDF';
@@ -36,7 +36,7 @@ interface Lead {
     olusturma_tarihi: string;
 }
 
-type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'services' | 'testimonials' | 'logo_clients' | 'packages' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit';
+type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'services' | 'testimonials' | 'logo_clients' | 'packages' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri';
 
 interface TabDef {
     id: TabId;
@@ -66,6 +66,7 @@ const TABS: TabDef[] = [
     { id: 'teklif_sablonu', label: 'Teklif / Sözleşme', icon: FileText, group: 'Belgeler' },
     { id: 'ziyaret_notu', label: 'Ziyaret Notu', icon: ClipboardList, group: 'Belgeler' },
     { id: 'kartvizit', label: 'Kartvizit (PDF)', icon: CreditCard, group: 'Belgeler' },
+    { id: 'yayin_bilgileri', label: 'Yayın Bilgileri', icon: Server, group: 'Sistem' },
 ];
 
 // ─── Helpers ───
@@ -362,6 +363,7 @@ export default function AdminPage() {
                     {activeTab === 'ziyaret_notu' && <ZiyaretNotu />}
                     {activeTab === 'egitim_seti' && <EgitimSeti />}
                     {activeTab === 'kartvizit' && <Kartvizit />}
+                    {activeTab === 'yayin_bilgileri' && <YayinBilgileri />}
                 </div>
             </main>
         </div>
@@ -1453,6 +1455,169 @@ function FooterEditor({ data, onSave, saving }: { data: any; onSave: (d: any) =>
             </EditorCard>
 
             <SaveButton onClick={() => onSave(local)} saving={saving} />
+        </div>
+    );
+}
+
+// ─── Yayın Bilgileri ───
+function YayinBilgileri() {
+    const [copiedField, setCopiedField] = useState<string | null>(null);
+
+    const copyToClipboard = (text: string, field: string) => {
+        navigator.clipboard.writeText(text);
+        setCopiedField(field);
+        setTimeout(() => setCopiedField(null), 2000);
+    };
+
+    const CopyBtn = ({ text, field }: { text: string; field: string }) => (
+        <button
+            onClick={() => copyToClipboard(text, field)}
+            className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+            title="Kopyala"
+        >
+            {copiedField === field ? (
+                <Check className="w-4 h-4 text-green-400" />
+            ) : (
+                <Copy className="w-4 h-4 text-gray-400" />
+            )}
+        </button>
+    );
+
+    const infoItems = [
+        {
+            label: '🌐 Website',
+            value: 'https://www.arslanops.com',
+            link: 'https://www.arslanops.com',
+            field: 'site'
+        },
+        {
+            label: '⚙️ Admin Paneli',
+            value: 'https://www.arslanops.com/admin',
+            link: 'https://www.arslanops.com/admin',
+            field: 'admin'
+        },
+        {
+            label: '🖥️ Backend API',
+            value: 'https://arslanops-web.onrender.com',
+            link: 'https://arslanops-web.onrender.com',
+            field: 'backend'
+        },
+        {
+            label: '🚀 Frontend Hosting (Vercel)',
+            value: 'https://vercel.com/giftlife20-designs-projects/arslanops-web',
+            link: 'https://vercel.com/giftlife20-designs-projects/arslanops-web',
+            field: 'vercel'
+        },
+        {
+            label: '📦 Backend Hosting (Render)',
+            value: 'https://dashboard.render.com',
+            link: 'https://dashboard.render.com',
+            field: 'render'
+        },
+        {
+            label: '💻 GitHub Repo',
+            value: 'https://github.com/giftlife20-design/arslanops-web',
+            link: 'https://github.com/giftlife20-design/arslanops-web',
+            field: 'github'
+        },
+        {
+            label: '🌍 Domain (GoDaddy)',
+            value: 'arslanops.com',
+            link: 'https://dcc.godaddy.com/control/arslanops.com',
+            field: 'godaddy'
+        },
+    ];
+
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <Server className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                    <h2 className="text-xl font-bold text-white">Yayın Bilgileri</h2>
+                    <p className="text-sm text-gray-400">Site URL'leri, platform linkleri ve erişim bilgileri</p>
+                </div>
+            </div>
+
+            {/* Site Linkleri */}
+            <div className="bg-white/5 rounded-2xl border border-white/10 p-6 space-y-1">
+                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-[#C5A55A]" />
+                    Site & Platform Linkleri
+                </h3>
+                {infoItems.map(item => (
+                    <div key={item.field} className="flex items-center justify-between py-3 px-4 rounded-xl hover:bg-white/5 transition-colors group">
+                        <div className="flex-1 min-w-0">
+                            <span className="text-sm text-gray-400 block">{item.label}</span>
+                            <span className="text-white text-sm font-mono truncate block">{item.value}</span>
+                        </div>
+                        <div className="flex items-center gap-1 ml-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <CopyBtn text={item.value} field={item.field} />
+                            <a
+                                href={item.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                                title="Aç"
+                            >
+                                <ExternalLink className="w-4 h-4 text-gray-400" />
+                            </a>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Giriş Bilgileri */}
+            <div className="bg-white/5 rounded-2xl border border-white/10 p-6">
+                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                    <LogIn className="w-4 h-4 text-[#C5A55A]" />
+                    Admin Giriş Bilgileri
+                </h3>
+                <div className="space-y-1">
+                    <div className="flex items-center justify-between py-3 px-4 rounded-xl hover:bg-white/5 transition-colors group">
+                        <div>
+                            <span className="text-sm text-gray-400 block">🔑 Kullanıcı Adı</span>
+                            <span className="text-white font-mono">admin</span>
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                            <CopyBtn text="admin" field="user" />
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-between py-3 px-4 rounded-xl hover:bg-white/5 transition-colors group">
+                        <div>
+                            <span className="text-sm text-gray-400 block">🔒 Şifre</span>
+                            <span className="text-white font-mono">••••••••••••••</span>
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                            <CopyBtn text="ArslanOps2026!Guclu" field="pass" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Notlar */}
+            <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl border border-blue-500/20 p-6">
+                <h3 className="text-white font-semibold mb-3">📋 Önemli Notlar</h3>
+                <ul className="space-y-2 text-sm text-gray-300">
+                    <li className="flex items-start gap-2">
+                        <span className="text-[#C5A55A] mt-0.5">•</span>
+                        <span><strong>Render (Backend)</strong> ücretsiz planda 15 dk hareketsizlikte uyku moduna geçer. İlk istek ~30 sn sürebilir.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                        <span className="text-[#C5A55A] mt-0.5">•</span>
+                        <span><strong>Vercel (Frontend)</strong> otomatik deploy yapar — GitHub&apos;a push yapıldığında site güncellenir.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                        <span className="text-[#C5A55A] mt-0.5">•</span>
+                        <span><strong>SSL (HTTPS)</strong> Vercel tarafından otomatik sağlanır.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                        <span className="text-[#C5A55A] mt-0.5">•</span>
+                        <span><strong>İçerik değişiklikleri</strong> bu admin panelden yapılır — platformlara girmenize gerek yoktur.</span>
+                    </li>
+                </ul>
+            </div>
         </div>
     );
 }
