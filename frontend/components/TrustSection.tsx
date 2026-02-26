@@ -158,25 +158,6 @@ export default function TrustSection() {
                 </div>
             </div>
 
-            {/* ────────── BÖLÜM 2: RAKAMLARLA KANIT ────────── */}
-            <div className="bg-gradient-to-r from-[#0B1F3B] to-[#132D52] py-14">
-                <div className="section-container">
-                    <div className={`grid grid-cols-2 md:grid-cols-4 gap-8 transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                        {STATS_PROOF.map((s, i) => {
-                            const Icon = s.icon;
-                            return (
-                                <div key={i} className="text-center group">
-                                    <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-[#C5A55A]/10 flex items-center justify-center group-hover:bg-[#C5A55A]/20 transition-colors">
-                                        <Icon className="w-6 h-6 text-[#C5A55A]" />
-                                    </div>
-                                    <div className="text-3xl md:text-4xl font-bold text-white mb-1">{s.value}</div>
-                                    <div className="text-sm text-gray-400">{s.label}</div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
 
             {/* ────────── BÖLÜM 3: BAŞARI HİKAYELERİ ────────── */}
             <div className="section-container py-16 md:py-20">
