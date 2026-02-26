@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { FileText, Download, Building2, Phone, Shield, Calendar, Loader2, Scale, Lock } from 'lucide-react';
+import { loadTurkishFont } from '../utils/pdfFontLoader';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -81,13 +82,14 @@ const INITIAL: SozlesmeData = {
     kalan_oran: '50',
     odeme_notu: 'Sozlesme imzalandiginda toplam ucretin %50\'si pesin odenir. Kalan %50 hizmet tamamlandiginda odenir.',
     gizlilik_suresi: '2 yil',
-    cezai_sart: '50.000',
+    cezai_sart: '50000',
 };
 
 /* ------------------------------------------------------------------ */
-/*  Transliteration                                                    */
+/*  Transliteration (fallback if font fails)                           */
 /* ------------------------------------------------------------------ */
-function tr(text: string): string {
+function tr(text: string, hasTurkishFont: boolean): string {
+    if (hasTurkishFont) return text;
     return text
         .replace(/ş/g, 's').replace(/Ş/g, 'S')
         .replace(/ı/g, 'i').replace(/İ/g, 'I')
@@ -108,6 +110,9 @@ async function generateHizmetSozlesmesi(data: SozlesmeData) {
     const autoTable = (await import('jspdf-autotable')).default;
 
     const doc = new jsPDF('p', 'mm', 'a4');
+    const hasTR = await loadTurkishFont(doc);
+    const t = (s: string) => tr(s, hasTR);
+    const fontName = hasTR ? 'Roboto' : 'Helvetica';
     const pageW = doc.internal.pageSize.getWidth();
     const pageH = doc.internal.pageSize.getHeight();
     const margin = 15;
@@ -132,16 +137,16 @@ async function generateHizmetSozlesmesi(data: SozlesmeData) {
         doc.rect(margin, y, 3, 8, 'F');
         doc.setTextColor(...navy);
         doc.setFontSize(11);
-        doc.setFont('Helvetica', 'bold');
-        doc.text(tr(title), margin + 7, y + 6);
+        doc.setFont(fontName, 'bold');
+        doc.text(t(title), margin + 7, y + 6);
         y += 14;
     };
 
     const addParagraph = (text: string, fontSize = 9) => {
-        doc.setFont('Helvetica', 'normal');
+        doc.setFont(fontName, 'normal');
         doc.setFontSize(fontSize);
         doc.setTextColor(...textDark);
-        const lines = doc.splitTextToSize(tr(text), contentW - 10);
+        const lines = doc.splitTextToSize(t(text), contentW - 10);
         checkPage(lines.length * 4.5 + 5);
         doc.text(lines, margin + 5, y);
         y += lines.length * 4.5 + 5;
@@ -155,14 +160,14 @@ async function generateHizmetSozlesmesi(data: SozlesmeData) {
 
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(18);
-    doc.setFont('Helvetica', 'bold');
-    doc.text(tr('DANISMANLIK HIZMET SOZLESMESI'), pageW / 2, 16, { align: 'center' });
+    doc.setFont(fontName, 'bold');
+    doc.text(t('DANIŞMANLIK HİZMET SÖZLEŞMESİ'), pageW / 2, 16, { align: 'center' });
 
     doc.setFontSize(10);
-    doc.setFont('Helvetica', 'normal');
-    doc.text(tr(`Sozlesme No: ${data.sozlesme_no}`), pageW / 2, 25, { align: 'center' });
+    doc.setFont(fontName, 'normal');
+    doc.text(t(`Sözleşme No: ${data.sozlesme_no}`), pageW / 2, 25, { align: 'center' });
     doc.setFontSize(8);
-    doc.text(tr(`Tarih: ${data.sozlesme_tarihi}`), pageW / 2, 31, { align: 'center' });
+    doc.text(t(`Tarih: ${data.sozlesme_tarihi}`), pageW / 2, 31, { align: 'center' });
     doc.text('ArslanOps', pageW / 2, 37, { align: 'center' });
 
     y = 52;
@@ -175,17 +180,17 @@ async function generateHizmetSozlesmesi(data: SozlesmeData) {
     doc.roundedRect(margin, y, contentW / 2 - 3, 44, 2, 2, 'F');
     doc.setTextColor(...navy);
     doc.setFontSize(9);
-    doc.setFont('Helvetica', 'bold');
-    doc.text('DANISMAN (Hizmet Veren)', margin + 4, y + 7);
-    doc.setFont('Helvetica', 'normal');
+    doc.setFont(fontName, 'bold');
+    doc.text(t('DANIŞMAN (Hizmet Veren)'), margin + 4, y + 7);
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...textDark);
-    doc.text(tr(data.danisman_adi), margin + 4, y + 14);
-    doc.text(tr(data.danisman_unvan), margin + 4, y + 19);
+    doc.text(t(data.danisman_adi), margin + 4, y + 14);
+    doc.text(t(data.danisman_unvan), margin + 4, y + 19);
     doc.text(data.danisman_telefon, margin + 4, y + 24);
     doc.text(data.danisman_email, margin + 4, y + 29);
-    if (data.danisman_vergi_dairesi) doc.text(tr(`VD: ${data.danisman_vergi_dairesi} - ${data.danisman_vergi_no}`), margin + 4, y + 34);
-    if (data.danisman_adres) doc.text(tr(data.danisman_adres).substring(0, 50), margin + 4, y + 39);
+    if (data.danisman_vergi_dairesi) doc.text(t(`VD: ${data.danisman_vergi_dairesi} - ${data.danisman_vergi_no}`), margin + 4, y + 34);
+    if (data.danisman_adres) doc.text(t(data.danisman_adres).substring(0, 50), margin + 4, y + 39);
 
     // Müşteri kutusu
     const rightX = margin + contentW / 2 + 3;
@@ -193,98 +198,126 @@ async function generateHizmetSozlesmesi(data: SozlesmeData) {
     doc.roundedRect(rightX, y, contentW / 2 - 3, 44, 2, 2, 'F');
     doc.setTextColor(...navy);
     doc.setFontSize(9);
-    doc.setFont('Helvetica', 'bold');
-    doc.text(tr('MUSTERI (Hizmet Alan)'), rightX + 4, y + 7);
-    doc.setFont('Helvetica', 'normal');
+    doc.setFont(fontName, 'bold');
+    doc.text(t('MÜŞTERİ (Hizmet Alan)'), rightX + 4, y + 7);
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...textDark);
-    doc.text(tr(data.musteri_adi || '(Ad Soyad)'), rightX + 4, y + 14);
-    doc.text(tr(data.musteri_isletme || '(Isletme Adi)'), rightX + 4, y + 19);
+    doc.text(t(data.musteri_adi || '(Ad Soyad)'), rightX + 4, y + 14);
+    doc.text(t(data.musteri_isletme || '(İşletme Adı)'), rightX + 4, y + 19);
     doc.text(data.musteri_telefon || '(Telefon)', rightX + 4, y + 24);
     doc.text(data.musteri_email || '(E-posta)', rightX + 4, y + 29);
-    if (data.musteri_vergi_dairesi) doc.text(tr(`VD: ${data.musteri_vergi_dairesi} - ${data.musteri_vergi_no}`), rightX + 4, y + 34);
-    if (data.musteri_adres) doc.text(tr(data.musteri_adres).substring(0, 50), rightX + 4, y + 39);
+    if (data.musteri_vergi_dairesi) doc.text(t(`VD: ${data.musteri_vergi_dairesi} - ${data.musteri_vergi_no}`), rightX + 4, y + 34);
+    if (data.musteri_adres) doc.text(t(data.musteri_adres).substring(0, 50), rightX + 4, y + 39);
 
     y += 52;
 
     // ---- MADDE 2: KONU ----
-    sectionTitle('MADDE 2 - SOZLESMENIN KONUSU');
-    addParagraph('Bu sozlesme, Danisman\'in Musteri\'ye asagida belirtilen danismanlik hizmetlerini vermesine iliskin taraflarin hak ve yukumluluklerini duzenlemektedir.');
+    sectionTitle('MADDE 2 - SÖZLEŞMENİN KONUSU');
+    addParagraph('Bu sözleşme, Danışman\'ın Müşteri\'ye aşağıda belirtilen danışmanlık hizmetlerini vermesine ilişkin tarafların hak ve yükümlülüklerini düzenlemektedir.');
 
     // ---- MADDE 3: HİZMET KAPSAMI ----
-    sectionTitle('MADDE 3 - HIZMET KAPSAMI');
+    sectionTitle('MADDE 3 - HİZMET KAPSAMI');
     addParagraph(data.hizmet_kapsami);
 
     // ---- MADDE 4: SÜRE ----
-    sectionTitle('MADDE 4 - SOZLESME SURESI');
+    sectionTitle('MADDE 4 - SÖZLEŞME SÜRESİ');
     const sureRows = [
-        [tr('Baslangic Tarihi'), tr(data.baslangic_tarihi || '(Belirlenmedi)')],
-        [tr('Bitis Tarihi'), tr(data.bitis_tarihi || '(Belirlenmedi)')],
-        [tr('Toplam Sure'), tr(data.sure || '(Belirlenmedi)')],
+        [t('Başlangıç Tarihi'), t(data.baslangic_tarihi || '(Belirlenmedi)')],
+        [t('Bitiş Tarihi'), t(data.bitis_tarihi || '(Belirlenmedi)')],
+        [t('Toplam Süre'), t(data.sure || '(Belirlenmedi)')],
     ];
     checkPage(30);
     autoTable(doc, {
         startY: y,
         body: sureRows,
         theme: 'plain',
-        bodyStyles: { fontSize: 9, font: 'Helvetica', textColor: textDark },
+        bodyStyles: { fontSize: 9, font: fontName, textColor: textDark },
         columnStyles: { 0: { cellWidth: 45, fontStyle: 'bold', textColor: navy }, 1: { cellWidth: contentW - 45 } },
         styles: { cellPadding: 3 },
         margin: { left: margin, right: margin },
     });
     y = (doc as any).lastAutoTable.finalY + 5;
-    addParagraph('Sozlesme suresi, taraflarin karsilikli yazili mutabakati ile uzatilabilir. Erken fesih durumunda Madde 7 hukumleri gecerlidir.');
+    addParagraph('Sözleşme süresi, tarafların karşılıklı yazılı mutabakatı ile uzatılabilir. Erken fesih durumunda Madde 9 hükümleri geçerlidir.');
 
     // ---- MADDE 5: ÜCRET VE ÖDEME ----
-    sectionTitle('MADDE 5 - UCRET VE ODEME KOSULLARI');
+    sectionTitle('MADDE 5 - ÜCRET VE ÖDEME KOŞULLARI');
 
     const ucret = data.toplam_ucret ? `${Number(data.toplam_ucret).toLocaleString('tr-TR')} TL` : '(Belirlenmedi)';
     const pesinTutar = data.toplam_ucret ? `${Math.round(Number(data.toplam_ucret) * Number(data.pesin_oran) / 100).toLocaleString('tr-TR')} TL` : '-';
     const kalanTutar = data.toplam_ucret ? `${Math.round(Number(data.toplam_ucret) * Number(data.kalan_oran) / 100).toLocaleString('tr-TR')} TL` : '-';
 
     const odemeRows = [
-        [tr('Toplam Danismanlik Ucreti'), ucret],
-        [tr(`Pesin Odeme (%${data.pesin_oran})`), tr(`${pesinTutar} - Sozlesme imzalandiginda`)],
-        [tr(`Kalan Odeme (%${data.kalan_oran})`), tr(`${kalanTutar} - Hizmet tamamlandiginda`)],
+        [t('Toplam Danışmanlık Ücreti'), ucret],
+        [t(`Peşin Ödeme (%${data.pesin_oran})`), t(`${pesinTutar} - Sözleşme imzalandığında`)],
+        [t(`Kalan Ödeme (%${data.kalan_oran})`), t(`${kalanTutar} - Hizmet tamamlandığında`)],
     ];
     checkPage(30);
     autoTable(doc, {
         startY: y,
         body: odemeRows,
         theme: 'striped',
-        bodyStyles: { fontSize: 9, font: 'Helvetica', textColor: textDark },
+        bodyStyles: { fontSize: 9, font: fontName, textColor: textDark },
         columnStyles: { 0: { cellWidth: 55, fontStyle: 'bold', textColor: navy }, 1: { cellWidth: contentW - 55 } },
         styles: { cellPadding: 3.5 },
         margin: { left: margin, right: margin },
     });
     y = (doc as any).lastAutoTable.finalY + 5;
     if (data.odeme_notu) addParagraph(data.odeme_notu);
-    addParagraph('Odemeler banka havalesi veya EFT yoluyla yapilir. Fatura, odeme tarihinden itibaren 7 is gunu icinde kesilir. KDV (% 20) ucrete dahil degildir ve ayrica faturalandirilir.');
+    addParagraph('Ödemeler banka havalesi veya EFT yoluyla yapılır. Fatura, ödeme tarihinden itibaren 7 iş günü içinde kesilir. KDV (%20) ücrete dahil değildir ve ayrıca faturalandırılır.');
 
     // ---- MADDE 6: TARAFLARIN YÜKÜMLÜLÜKLERİ ----
-    sectionTitle('MADDE 6 - TARAFLARIN YUKUMLULUKLERI');
-    addParagraph('6.1 Danisman\'in Yukumlulukleri:\n- Hizmeti profesyonel standartlarda, ozenle ve zamanlica sunmak\n- Musteri\'nin ticari sirlarini ve gizli bilgilerini korumak\n- Ilerleme raporlarini zamaninda teslim etmek\n- Sozlesme kapsamindaki tum calismalari bizzat veya onay alinmis ekibi ile yurutmek');
-    addParagraph('6.2 Musteri\'nin Yukumlulukleri:\n- Hizmetin yurutulmesi icin gerekli bilgi, belge ve erisimi saglamak\n- Odeme yukukumluluklerin zamaninda yerine getirmek\n- Danisman\'in onerilerini makul surede degerlendirmek\n- Danisman\'a gerekli calisma ortamini ve isbirligi imkanini sunmak');
+    sectionTitle('MADDE 6 - TARAFLARIN YÜKÜMLÜLÜKLERİ');
+    addParagraph('6.1 Danışman\'ın Yükümlülükleri:\n- Hizmeti profesyonel standartlarda, özenle ve zamanında sunmak\n- Müşteri\'nin ticari sırlarını ve gizli bilgilerini korumak\n- İlerleme raporlarını zamanında teslim etmek\n- Sözleşme kapsamındaki tüm çalışmaları bizzat veya onay alınmış ekibi ile yürütmek\n- Danışmanlık niteliğinde hizmet vermek (uygulama sorumluluğu Müşteri\'ye aittir)');
+    addParagraph('6.2 Müşteri\'nin Yükümlülükleri:\n- Hizmetin yürütülmesi için gerekli bilgi, belge, veri ve erişimi zamanında sağlamak\n- Ödeme yükümlülüklerini zamanında yerine getirmek\n- Danışman\'ın önerilerini makul sürede değerlendirmek\n- Danışman\'a gerekli çalışma ortamını ve işbirliği imkanını sunmak\n- Sözleşme kapsamında bir İrtibat/Sorumlu Kişi atamak (bkz. Madde 7)');
+
+    // ---- MADDE 7: SORUMLU KİŞİ VE VERİ SAĞLAMA ----
+    sectionTitle('MADDE 7 - SORUMLU KİŞİ ATAMASI VE VERİ SAĞLAMA');
+    addParagraph('7.1 Müşteri, sözleşme imzalandıktan sonra en geç 3 (üç) iş günü içinde danışmanlık sürecinde Danışman ile iletişim kuracak ve gerekli bilgi/veri akışını sağlayacak bir "Sorumlu Kişi" (İrtibat Kişisi) belirlemelidir.');
+    addParagraph('7.2 Sorumlu Kişi\'nin görevleri:\n- Danışman tarafından talep edilen veri, belge ve bilgileri zamanında temin etmek\n- İşletme içi koordinasyonu sağlamak\n- Haftalık toplantılara katılmak veya temsilci göndermek\n- Danışman\'ın erişim ihtiyaçlarını (sistem, personel, alan) karşılamak');
+    addParagraph('7.3 Müşteri tarafından talep edilen bilgi ve verilerin sözleşmede belirtilen sürelerde sağlanmaması durumunda, bu gecikmeden kaynaklanan teslimat aksaklıklarından Danışman sorumlu tutulamaz. Geciken süre, teslimat takviminin sonuna eklenir.');
+    addParagraph('7.4 Veri sağlama gecikmesi 15 (on beş) iş gününü aşarsa Danışman, sözleşmeyi askıya alma veya fesih hakkına sahiptir. Bu durumda yapılmış ödemeler iade edilmez.');
+
+    // ---- MADDE 8: DANIŞMANLIK NİTELİĞİ VE SORUMLULUK SINIRI ----
+    sectionTitle('MADDE 8 - DANIŞMANLIK NİTELİĞİ VE SORUMLULUK SINIRI');
+    addParagraph('8.1 Danışman yalnızca danışmanlık, analiz, raporlama ve öneri hizmeti vermektedir. Önerilerin uygulanması, personel yönetimi ve işletme operasyonlarının yürütülmesi tamamen Müşteri\'nin sorumluluğundadır.');
+    addParagraph('8.2 Danışman\'ın sunduğu önerilerin Müşteri tarafından uygulanıp uygulanmaması Müşteri\'nin takdirindedir. Uygulama sonuçlarından Danışman sorumlu tutulamaz.');
+    addParagraph('8.3 Danışman\'ın sorumluluğu, her halükarda alınan toplam danışmanlık ücreti ile sınırlıdır.');
 
     // ---- MADDE 7: FESİH ----
-    sectionTitle('MADDE 7 - FESIH KOSULLARI');
-    addParagraph('7.1 Taraflardan her biri, 15 (on bes) gun onceden yazili bildirimde bulunarak sozlesmeyi feshedebilir.');
-    addParagraph('7.2 Musteri tarafindan erken fesih halinde, fesih tarihine kadar verilen hizmetlerin bedeli ve yapilan masraflar Musteri tarafindan odenir. Pesin odenen tutar iade edilmez.');
-    addParagraph('7.3 Danisman tarafindan erken fesih halinde, tamamlanmamis hizmetlere ait pesin alinan ucret iade edilir.');
+    sectionTitle('MADDE 9 - FESİH KOŞULLARI');
+    addParagraph('9.1 Taraflardan her biri, 15 (on beş) gün önceden yazılı bildirimde bulunarak sözleşmeyi feshedebilir.');
+    addParagraph('9.2 Müşteri tarafından erken fesih halinde, fesih tarihine kadar verilen hizmetlerin bedeli ve yapılan masraflar Müşteri tarafından ödenir. Peşin ödenen tutar iade edilmez.');
+    addParagraph('9.3 Danışman tarafından erken fesih halinde, tamamlanmamış hizmetlere ait peşin alınan ücret iade edilir.');
 
-    // ---- MADDE 8: GİZLİLİK ----
-    sectionTitle('MADDE 8 - GIZLILIK');
-    addParagraph('Taraflar, bu sozlesme kapsaminda edindikleri tum ticari, mali ve operasyonel bilgileri gizli tutmayi, ucuncu sahislarla paylasmamayi ve yalnizca sozlesme amaci dogrultusunda kullanmayi taahhut eder. Bu yukumluluk sozlesmenin sona ermesinden sonra da 2 (iki) yil sureyle gecerlidir.');
+    // ---- MADDE 10: GİZLİLİK ----
+    sectionTitle('MADDE 10 - GİZLİLİK');
+    addParagraph('Taraflar, bu sözleşme kapsamında edindikleri tüm ticari, mali ve operasyonel bilgileri gizli tutmayı, üçüncü şahıslarla paylaşmamayı ve yalnızca sözleşme amacı doğrultusunda kullanmayı taahhüt eder. Bu yükümlülük sözleşmenin sona ermesinden sonra da 2 (iki) yıl süreyle yürürlükte kalır.');
 
-    // ---- MADDE 9: UYUŞMAZLIK ----
-    sectionTitle('MADDE 9 - UYUSMAZLIK COZUMU');
-    addParagraph('Bu sozlesmeden dogan uyusmazliklarda once dostane cozum yolu aranacaktir. Cozume ulasilamamasi halinde Istanbul Mahkemeleri ve Icra Daireleri yetkilidir.');
+    // ---- MADDE 11: MÜCBİR SEBEP ----
+    sectionTitle('MADDE 11 - MÜCBİR SEBEP');
+    addParagraph('Doğal afet, salgın hastalık, savaş, hükümet kararları, internet/altyapı kesintileri gibi tarafların kontrolü dışındaki olaylar nedeniyle yükümlülüklerin yerine getirilememesi halinde, etkilenen taraf sorumluluktan muaf tutulur. Mücbir sebep 30 günü aşarsa taraflar sözleşmeyi feshedebilir.');
 
-    // ---- MADDE 10: GENEL HÜKÜMLER ----
-    sectionTitle('MADDE 10 - GENEL HUKUMLER');
-    addParagraph('10.1 Bu sozlesme, taraflarin serbest iradeleri ile tanzim edilmis olup, imza tarihinden itibaren yururluge girer.');
-    addParagraph('10.2 Sozlesmede yapilacak degisiklikler, taraflarin yazili mutabakati ile gecerlilik kazanir.');
-    addParagraph('10.3 Bu sozlesme 2 (iki) nusha olarak hazirlanmis ve her iki tarafca imzalanmistir.');
+    // ---- MADDE 12: FİKRİ MÜLKİYET ----
+    sectionTitle('MADDE 12 - FİKRİ MÜLKİYET');
+    addParagraph('12.1 Danışman tarafından bu sözleşme kapsamında üretilen raporlar, analizler, şablonlar ve dokümanlar, ücretin tam olarak ödenmesi koşuluyla Müşteri\'nin kullanımına sunulur.');
+    addParagraph('12.2 Danışman\'ın genel bilgi birikimi, metodolojisi ve araçları üzerindeki fikri mülkiyet hakları saklıdır.');
+
+    // ---- MADDE 13: İLETİŞİM PROTOKOLÜ ----
+    sectionTitle('MADDE 13 - İLETİŞİM PROTOKOLÜ');
+    addParagraph('13.1 Taraflar arasındaki iletişim; e-posta, telefon ve mesajlaşma uygulamaları üzerinden yürütülür.');
+    addParagraph('13.2 Resmi bildirimler (fesih, değişiklik vb.) yazılı olarak (e-posta dahil) yapılır.');
+    addParagraph('13.3 Danışman, haftalık ilerleme raporu sunar. Müşteri, talep edilen bilgilere en geç 3 iş günü içinde yanıt verir.');
+
+    // ---- MADDE 14: UYUŞMAZLIK ----
+    sectionTitle('MADDE 14 - UYUŞMAZLIK ÇÖZÜMÜ');
+    addParagraph('Bu sözleşmeden doğan uyuşmazlıklarda önce dostane çözüm yolu aranacaktır. Çözüme ulaşılamaması halinde İstanbul Mahkemeleri ve İcra Daireleri yetkilidir.');
+
+    // ---- MADDE 15: GENEL HÜKÜMLER ----
+    sectionTitle('MADDE 15 - GENEL HÜKÜMLER');
+    addParagraph('15.1 Bu sözleşme, tarafların serbest iradeleri ile tanzim edilmiş olup, imza tarihinden itibaren yürürlüğe girer.');
+    addParagraph('15.2 Sözleşmede yapılacak değişiklikler, tarafların yazılı mutabakatı ile geçerlilik kazanır.');
+    addParagraph('15.3 Bu sözleşme 2 (iki) nüsha olarak hazırlanmış ve her iki tarafça imzalanmıştır.');
 
     // ---- İMZA ALANI ----
     checkPage(50);
@@ -295,22 +328,22 @@ async function generateHizmetSozlesmesi(data: SozlesmeData) {
 
     doc.setTextColor(...navy);
     doc.setFontSize(9);
-    doc.setFont('Helvetica', 'bold');
-    doc.text('DANISMAN', margin + 4, y + 7);
-    doc.text(tr('MUSTERI'), margin + contentW / 2 + 9, y + 7);
+    doc.setFont(fontName, 'bold');
+    doc.text(t('DANIŞMAN'), margin + 4, y + 7);
+    doc.text(t('MÜŞTERİ'), margin + contentW / 2 + 9, y + 7);
 
-    doc.setFont('Helvetica', 'normal');
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...textGray);
-    doc.text(tr(data.danisman_adi), margin + 4, y + 14);
-    doc.text('Imza: _________________', margin + 4, y + 26);
+    doc.text(t(data.danisman_adi), margin + 4, y + 14);
+    doc.text(t('İmza: _________________'), margin + 4, y + 26);
     doc.text('Tarih: _________________', margin + 4, y + 32);
-    doc.text(tr('Kase / Muhur'), margin + 4, y + 38);
+    doc.text(t('Kaşe / Mühür'), margin + 4, y + 38);
 
-    doc.text(tr(data.musteri_adi || '(Ad Soyad)'), margin + contentW / 2 + 9, y + 14);
-    doc.text('Imza: _________________', margin + contentW / 2 + 9, y + 26);
+    doc.text(t(data.musteri_adi || '(Ad Soyad)'), margin + contentW / 2 + 9, y + 14);
+    doc.text(t('İmza: _________________'), margin + contentW / 2 + 9, y + 26);
     doc.text('Tarih: _________________', margin + contentW / 2 + 9, y + 32);
-    doc.text(tr('Kase / Muhur'), margin + contentW / 2 + 9, y + 38);
+    doc.text(t('Kaşe / Mühür'), margin + contentW / 2 + 9, y + 38);
 
     // ---- FOOTER (all pages) ----
     const totalPages = doc.internal.pages.length - 1;
@@ -321,15 +354,15 @@ async function generateHizmetSozlesmesi(data: SozlesmeData) {
         doc.line(margin, pageH - 15, pageW - margin, pageH - 15);
         doc.setTextColor(...textGray);
         doc.setFontSize(7);
-        doc.setFont('Helvetica', 'normal');
-        doc.text(tr('ArslanOps Danismanlik | info@arslanops.com | +90 539 233 11 474'), margin, pageH - 10);
+        doc.setFont(fontName, 'normal');
+        doc.text(t('ArslanOps Danışmanlık | info@arslanops.com | +90 539 233 11 474'), margin, pageH - 10);
         doc.text(`Sayfa ${p} / ${totalPages}`, pageW - margin, pageH - 10, { align: 'right' });
         doc.setFontSize(6);
         doc.setTextColor(180, 180, 180);
-        doc.text(tr('Bu sozlesme gizli olup yalnizca taraflarin kullanimina mahsustur.'), pageW / 2, pageH - 6, { align: 'center' });
+        doc.text(t('Bu sözleşme gizli olup yalnızca tarafların kullanımına mahsustur.'), pageW / 2, pageH - 6, { align: 'center' });
     }
 
-    const fileName = tr(`Hizmet_Sozlesmesi_${data.musteri_isletme.replace(/\s+/g, '_') || 'Musteri'}_${data.sozlesme_no}.pdf`);
+    const fileName = t(`Hizmet_Sözleşmesi_${data.musteri_isletme.replace(/\s+/g, '_') || 'Müşteri'}_${data.sozlesme_no}.pdf`);
     doc.save(fileName);
 }
 
@@ -340,6 +373,9 @@ async function generateGizlilikSozlesmesi(data: SozlesmeData) {
     const { jsPDF } = await import('jspdf');
 
     const doc = new jsPDF('p', 'mm', 'a4');
+    const hasTR = await loadTurkishFont(doc);
+    const t = (s: string) => tr(s, hasTR);
+    const fontName = hasTR ? 'Roboto' : 'Helvetica';
     const pageW = doc.internal.pageSize.getWidth();
     const pageH = doc.internal.pageSize.getHeight();
     const margin = 15;
@@ -361,16 +397,16 @@ async function generateGizlilikSozlesmesi(data: SozlesmeData) {
         doc.rect(margin, y, 3, 8, 'F');
         doc.setTextColor(...navy);
         doc.setFontSize(11);
-        doc.setFont('Helvetica', 'bold');
-        doc.text(tr(title), margin + 7, y + 6);
+        doc.setFont(fontName, 'bold');
+        doc.text(t(title), margin + 7, y + 6);
         y += 14;
     };
 
     const addParagraph = (text: string, fontSize = 9) => {
-        doc.setFont('Helvetica', 'normal');
+        doc.setFont(fontName, 'normal');
         doc.setFontSize(fontSize);
         doc.setTextColor(...textDark);
-        const lines = doc.splitTextToSize(tr(text), contentW - 10);
+        const lines = doc.splitTextToSize(t(text), contentW - 10);
         checkPage(lines.length * 4.5 + 5);
         doc.text(lines, margin + 5, y);
         y += lines.length * 4.5 + 5;
@@ -384,31 +420,30 @@ async function generateGizlilikSozlesmesi(data: SozlesmeData) {
 
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(18);
-    doc.setFont('Helvetica', 'bold');
-    doc.text(tr('GIZLILIK SOZLESMESI (NDA)'), pageW / 2, 16, { align: 'center' });
+    doc.setFont(fontName, 'bold');
+    doc.text(t('GİZLİLİK SÖZLEŞMESİ (NDA)'), pageW / 2, 16, { align: 'center' });
     doc.setFontSize(10);
-    doc.setFont('Helvetica', 'normal');
-    doc.text(tr('Karsilikli Gizlilik Taahhutnamesi'), pageW / 2, 25, { align: 'center' });
+    doc.setFont(fontName, 'normal');
+    doc.text(t('Karşılıklı Gizlilik Taahhütnamesi'), pageW / 2, 25, { align: 'center' });
     doc.setFontSize(8);
-    doc.text(tr(`Tarih: ${data.sozlesme_tarihi}`), pageW / 2, 31, { align: 'center' });
+    doc.text(t(`Tarih: ${data.sozlesme_tarihi}`), pageW / 2, 31, { align: 'center' });
     doc.text('ArslanOps', pageW / 2, 37, { align: 'center' });
 
     y = 52;
 
-    // ---- MADDE 1: TARAFLAR ----
     sectionTitle('MADDE 1 - TARAFLAR');
 
     doc.setFillColor(248, 250, 252);
     doc.roundedRect(margin, y, contentW / 2 - 3, 35, 2, 2, 'F');
     doc.setTextColor(...navy);
     doc.setFontSize(9);
-    doc.setFont('Helvetica', 'bold');
-    doc.text('TARAF A (Danisman)', margin + 4, y + 7);
-    doc.setFont('Helvetica', 'normal');
+    doc.setFont(fontName, 'bold');
+    doc.text(t('TARAF A (Danışman)'), margin + 4, y + 7);
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...textDark);
-    doc.text(tr(data.danisman_adi), margin + 4, y + 14);
-    doc.text(tr(data.danisman_unvan), margin + 4, y + 19);
+    doc.text(t(data.danisman_adi), margin + 4, y + 14);
+    doc.text(t(data.danisman_unvan), margin + 4, y + 19);
     doc.text(data.danisman_email, margin + 4, y + 24);
     doc.text(data.danisman_telefon, margin + 4, y + 29);
 
@@ -417,56 +452,48 @@ async function generateGizlilikSozlesmesi(data: SozlesmeData) {
     doc.roundedRect(rightX, y, contentW / 2 - 3, 35, 2, 2, 'F');
     doc.setTextColor(...navy);
     doc.setFontSize(9);
-    doc.setFont('Helvetica', 'bold');
-    doc.text(tr('TARAF B (Musteri)'), rightX + 4, y + 7);
-    doc.setFont('Helvetica', 'normal');
+    doc.setFont(fontName, 'bold');
+    doc.text(t('TARAF B (Müşteri)'), rightX + 4, y + 7);
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...textDark);
-    doc.text(tr(data.musteri_adi || '(Ad Soyad)'), rightX + 4, y + 14);
-    doc.text(tr(data.musteri_isletme || '(Isletme Adi)'), rightX + 4, y + 19);
+    doc.text(t(data.musteri_adi || '(Ad Soyad)'), rightX + 4, y + 14);
+    doc.text(t(data.musteri_isletme || '(İşletme Adı)'), rightX + 4, y + 19);
     doc.text(data.musteri_email || '(E-posta)', rightX + 4, y + 24);
     doc.text(data.musteri_telefon || '(Telefon)', rightX + 4, y + 29);
 
     y += 42;
 
-    // ---- MADDE 2 ----
-    sectionTitle('MADDE 2 - AMAC');
-    addParagraph('Bu sozlesme, taraflarin danismanlik hizmeti kapsaminda birbirlerine aciklayacaklari gizli bilgilerin korunmasini saglamak amaciyla duzenlenmistir. Her iki taraf da karsilikli olarak gizlilik yukumlulugu altindadir.');
+    sectionTitle('MADDE 2 - AMAÇ');
+    addParagraph('Bu sözleşme, tarafların danışmanlık hizmeti kapsamında birbirlerine açıklayacakları gizli bilgilerin korunmasını sağlamak amacıyla düzenlenmiştir. Her iki taraf da karşılıklı olarak gizlilik yükümlülüğü altındadır.');
 
-    // ---- MADDE 3 ----
-    sectionTitle('MADDE 3 - GIZLI BILGI TANIMI');
-    addParagraph('Gizli bilgi, taraflardan birinin digerine yazili, sozlu, elektronik veya herhangi bir yolla iletilen asagidaki nitelikteki tum bilgileri kapsar:');
-    addParagraph('a) Ticari sirlar, is planlari, stratejiler, mali veriler\nb) Musteri listeleri, tedarikci bilgileri, fiyatlandirma politikalari\nc) Operasyonel surecler, receteler, formüller, uretim yontemleri\nd) Calisan bilgileri, maas verileri, organizasyon yapisi\ne) IT altyapisi, yazilim bilgileri, kullanici verileri\nf) Danismanlik raporlari, analiz sonuclari, oneriler ve aksiyon planlari\ng) Sozlesme detaylari ve ticari iliskiyle ilgili her turlu bilgi');
+    sectionTitle('MADDE 3 - GİZLİ BİLGİ TANIMI');
+    addParagraph('Gizli bilgi, taraflardan birinin diğerine yazılı, sözlü, elektronik veya herhangi bir yolla iletilen aşağıdaki nitelikteki tüm bilgileri kapsar:');
+    addParagraph('a) Ticari sırlar, iş planları, stratejiler, mali veriler\nb) Müşteri listeleri, tedarikçi bilgileri, fiyatlandırma politikaları\nc) Operasyonel süreçler, reçeteler, formüller, üretim yöntemleri\nd) Çalışan bilgileri, maaş verileri, organizasyon yapısı\ne) IT altyapısı, yazılım bilgileri, kullanıcı verileri\nf) Danışmanlık raporları, analiz sonuçları, öneriler ve aksiyon planları\ng) Sözleşme detayları ve ticari ilişkiyle ilgili her türlü bilgi');
 
-    // ---- MADDE 4 ----
-    sectionTitle('MADDE 4 - GIZLILIK YUKUMLULUKLERI');
-    addParagraph('4.1 Taraflar, gizli bilgileri yalnizca sozlesme amaci dogrultusunda kullanacaktir.');
-    addParagraph('4.2 Gizli bilgiler, karsi tarafin yazili izni olmaksizin ucuncu sahislarla paylasilmayacaktir.');
-    addParagraph('4.3 Taraflar, gizli bilgileri en az kendi gizli bilgilerini korudugu olcude koruyacaktir.');
-    addParagraph('4.4 Gizli bilgilere erisim, yalnizca "bilmesi gereken" kisilere sinirli tutulacaktir.');
-    addParagraph('4.5 Gizli bilgilerin kopyalanmasi, cogaltilmasi veya kaydedilmesi yalnizca is geregi gerekli oldugunce yapilabilir.');
+    sectionTitle('MADDE 4 - GİZLİLİK YÜKÜMLÜLÜKLERİ');
+    addParagraph('4.1 Taraflar, gizli bilgileri yalnızca sözleşme amacı doğrultusunda kullanacaktır.');
+    addParagraph('4.2 Gizli bilgiler, karşı tarafın yazılı izni olmaksızın üçüncü şahıslarla paylaşılmayacaktır.');
+    addParagraph('4.3 Taraflar, gizli bilgileri en az kendi gizli bilgilerini koruduğu ölçüde koruyacaktır.');
+    addParagraph('4.4 Gizli bilgilere erişim, yalnızca "bilmesi gereken" kişilere sınırlı tutulacaktır.');
+    addParagraph('4.5 Gizli bilgilerin kopyalanması, çoğaltılması veya kaydedilmesi yalnızca iş gereği gerekli olduğunca yapılabilir.');
 
-    // ---- MADDE 5 ----
-    sectionTitle('MADDE 5 - ISTISNALAR');
-    addParagraph('Asagidaki durumlar gizlilik kapsaminda degildir:\na) Kamuya acik olan veya tarafin kusuru olmaksizin kamuya acik hale gelen bilgiler\nb) Alici tarafin gizlilik yukumlulugu olmaksizin ucuncu bir sahistan yasal yollarla edindigi bilgiler\nc) Alici tarafin bagimsiz olarak gelistirdigi bilgiler\nd) Yasal zorunluluk nedeniyle ifsa edilmesi gereken bilgiler (bu durumda diger taraf derhal bilgilendirilecektir)');
+    sectionTitle('MADDE 5 - İSTİSNALAR');
+    addParagraph('Aşağıdaki durumlar gizlilik kapsamında değildir:\na) Kamuya açık olan veya tarafın kusuru olmaksızın kamuya açık hale gelen bilgiler\nb) Alıcı tarafın gizlilik yükümlülüğü olmaksızın üçüncü bir şahıstan yasal yollarla edindiği bilgiler\nc) Alıcı tarafın bağımsız olarak geliştirdiği bilgiler\nd) Yasal zorunluluk nedeniyle ifşa edilmesi gereken bilgiler (bu durumda diğer taraf derhal bilgilendirilecektir)');
 
-    // ---- MADDE 6 ----
-    sectionTitle('MADDE 6 - SURE');
-    addParagraph(`Bu gizlilik sozlesmesi, imza tarihinden itibaren gecerli olup, danismanlik sozlesmesinin sona ermesinden sonra ${data.gizlilik_suresi} sure ile yururlukte kalmaya devam eder.`);
+    sectionTitle('MADDE 6 - SÜRE');
+    addParagraph(`Bu gizlilik sözleşmesi, imza tarihinden itibaren geçerli olup, danışmanlık sözleşmesinin sona ermesinden sonra ${data.gizlilik_suresi} süre ile yürürlükte kalmaya devam eder.`);
 
-    // ---- MADDE 7 ----
-    sectionTitle('MADDE 7 - IHLAL VE CEZAI SART');
-    addParagraph(`7.1 Gizlilik yukumlulugunu ihlal eden taraf, diger tarafa ${data.cezai_sart ? Number(data.cezai_sart).toLocaleString('tr-TR') + ' TL' : '(Belirlenmedi)'} tutarinda cezai sart odemeyi kabul ve taahhut eder.`);
-    addParagraph('7.2 Cezai sartin odenmesi, zarar goren tarafin genel hukumlere gore tazminat talep etme hakkini ortadan kaldirmaz.');
-    addParagraph('7.3 Ihlal halinde zarar goren taraf, ihtiyati tedbir ve diger yasal yollara basvurma hakkini sakli tutar.');
+    sectionTitle('MADDE 7 - İHLAL VE CEZAİ ŞART');
+    addParagraph(`7.1 Gizlilik yükümlülüğünü ihlal eden taraf, diğer tarafa ${data.cezai_sart ? Number(data.cezai_sart).toLocaleString('tr-TR') + ' TL' : '(Belirlenmedi)'} tutarında cezai şart ödemeyi kabul ve taahhüt eder.`);
+    addParagraph('7.2 Cezai şartın ödenmesi, zarar gören tarafın genel hükümlere göre tazminat talep etme hakkını ortadan kaldırmaz.');
+    addParagraph('7.3 İhlal halinde zarar gören taraf, ihtiyati tedbir ve diğer yasal yollara başvurma hakkını saklı tutar.');
 
-    // ---- MADDE 8 ----
-    sectionTitle('MADDE 8 - IADE YUKUMLULUGU');
-    addParagraph('Sozlesmenin sona ermesi veya feshi halinde, taraflar birbirlerine ait tum gizli bilgileri, kopyalari ve turevlerini iade edecek veya imha edecek ve bunu yazili olarak teyit edecektir.');
+    sectionTitle('MADDE 8 - İADE YÜKÜMLÜLÜĞÜ');
+    addParagraph('Sözleşmenin sona ermesi veya feshi halinde, taraflar birbirlerine ait tüm gizli bilgileri, kopyaları ve türevlerini iade edecek veya imha edecek ve bunu yazılı olarak teyit edecektir.');
 
-    // ---- MADDE 9 ----
-    sectionTitle('MADDE 9 - UYGULANACAK HUKUK VE YETKI');
-    addParagraph('Bu sozlesme Turkiye Cumhuriyeti hukukuna tabidir. Uyusmazliklarda Istanbul Mahkemeleri ve Icra Daireleri yetkilidir.');
+    sectionTitle('MADDE 9 - UYGULANACAK HUKUK VE YETKİ');
+    addParagraph('Bu sözleşme Türkiye Cumhuriyeti hukukuna tabidir. Uyuşmazlıklarda İstanbul Mahkemeleri ve İcra Daireleri yetkilidir.');
 
     // ---- İMZA ALANI ----
     checkPage(55);
@@ -477,22 +504,22 @@ async function generateGizlilikSozlesmesi(data: SozlesmeData) {
 
     doc.setTextColor(...navy);
     doc.setFontSize(9);
-    doc.setFont('Helvetica', 'bold');
-    doc.text('TARAF A (Danisman)', margin + 4, y + 7);
-    doc.text(tr('TARAF B (Musteri)'), margin + contentW / 2 + 9, y + 7);
+    doc.setFont(fontName, 'bold');
+    doc.text(t('TARAF A (Danışman)'), margin + 4, y + 7);
+    doc.text(t('TARAF B (Müşteri)'), margin + contentW / 2 + 9, y + 7);
 
-    doc.setFont('Helvetica', 'normal');
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...textGray);
-    doc.text(tr(data.danisman_adi), margin + 4, y + 14);
-    doc.text('Imza: _________________', margin + 4, y + 26);
+    doc.text(t(data.danisman_adi), margin + 4, y + 14);
+    doc.text(t('İmza: _________________'), margin + 4, y + 26);
     doc.text('Tarih: _________________', margin + 4, y + 32);
-    doc.text(tr('Kase / Muhur'), margin + 4, y + 38);
+    doc.text(t('Kaşe / Mühür'), margin + 4, y + 38);
 
-    doc.text(tr(data.musteri_adi || '(Ad Soyad)'), margin + contentW / 2 + 9, y + 14);
-    doc.text('Imza: _________________', margin + contentW / 2 + 9, y + 26);
+    doc.text(t(data.musteri_adi || '(Ad Soyad)'), margin + contentW / 2 + 9, y + 14);
+    doc.text(t('İmza: _________________'), margin + contentW / 2 + 9, y + 26);
     doc.text('Tarih: _________________', margin + contentW / 2 + 9, y + 32);
-    doc.text(tr('Kase / Muhur'), margin + contentW / 2 + 9, y + 38);
+    doc.text(t('Kaşe / Mühür'), margin + contentW / 2 + 9, y + 38);
 
     // ---- FOOTER ----
     const totalPages = doc.internal.pages.length - 1;
@@ -503,15 +530,15 @@ async function generateGizlilikSozlesmesi(data: SozlesmeData) {
         doc.line(margin, pageH - 15, pageW - margin, pageH - 15);
         doc.setTextColor(...textGray);
         doc.setFontSize(7);
-        doc.setFont('Helvetica', 'normal');
-        doc.text(tr('ArslanOps Danismanlik | info@arslanops.com | +90 539 233 11 474'), margin, pageH - 10);
+        doc.setFont(fontName, 'normal');
+        doc.text(t('ArslanOps Danışmanlık | info@arslanops.com | +90 539 233 11 474'), margin, pageH - 10);
         doc.text(`Sayfa ${p} / ${totalPages}`, pageW - margin, pageH - 10, { align: 'right' });
         doc.setFontSize(6);
         doc.setTextColor(180, 180, 180);
-        doc.text(tr('GIZLI - Bu belge yalnizca imza sahibi taraflarin kullanimina mahsustur.'), pageW / 2, pageH - 6, { align: 'center' });
+        doc.text(t('GİZLİ - Bu belge yalnızca imza sahibi tarafların kullanımına mahsustur.'), pageW / 2, pageH - 6, { align: 'center' });
     }
 
-    const fileName = tr(`Gizlilik_Sozlesmesi_NDA_${data.musteri_isletme.replace(/\s+/g, '_') || 'Musteri'}_${data.sozlesme_tarihi}.pdf`);
+    const fileName = t(`Gizlilik_Sözleşmesi_NDA_${data.musteri_isletme.replace(/\s+/g, '_') || 'Müşteri'}_${data.sozlesme_tarihi}.pdf`);
     doc.save(fileName);
 }
 
@@ -554,8 +581,8 @@ export default function SozlesmeSablonu() {
                 <button
                     onClick={() => setTip('hizmet')}
                     className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 font-semibold text-sm transition-all ${tip === 'hizmet'
-                            ? 'border-[#C4803D] bg-[#C4803D]/10 text-[#C4803D]'
-                            : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        ? 'border-[#C4803D] bg-[#C4803D]/10 text-[#C4803D]'
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
                         }`}
                 >
                     <FileText className="w-4 h-4" /> Hizmet Sözleşmesi
@@ -563,8 +590,8 @@ export default function SozlesmeSablonu() {
                 <button
                     onClick={() => setTip('gizlilik')}
                     className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 font-semibold text-sm transition-all ${tip === 'gizlilik'
-                            ? 'border-purple-500 bg-purple-500/10 text-purple-600'
-                            : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        ? 'border-purple-500 bg-purple-500/10 text-purple-600'
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
                         }`}
                 >
                     <Lock className="w-4 h-4" /> Gizlilik Sözleşmesi (NDA)
@@ -684,8 +711,8 @@ export default function SozlesmeSablonu() {
                 onClick={handleGenerate}
                 disabled={generating}
                 className={`w-full flex items-center justify-center gap-2 px-6 py-3.5 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 ${tip === 'hizmet'
-                        ? 'bg-gradient-to-r from-[#0B1F3B] to-[#1a365d]'
-                        : 'bg-gradient-to-r from-purple-700 to-purple-900'
+                    ? 'bg-gradient-to-r from-[#0B1F3B] to-[#1a365d]'
+                    : 'bg-gradient-to-r from-purple-700 to-purple-900'
                     }`}
             >
                 {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
