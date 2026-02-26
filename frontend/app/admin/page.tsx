@@ -7,7 +7,7 @@ import {
     MessageSquare, Package, HelpCircle, UserCircle, Globe,
     Save, Plus, Trash2, GripVertical, Star, ChevronRight,
     Quote, Settings, Eye, Upload, Image, Video, Palette,
-    Paintbrush, X, ClipboardList, BookOpen, CreditCard, Server, ExternalLink, Copy, Check
+    Paintbrush, X, ClipboardList, BookOpen, CreditCard, Server, ExternalLink, Copy, Check, Scale
 } from 'lucide-react';
 import Link from 'next/link';
 import DurumOzetiForm from '../../components/DurumOzetiPDF';
@@ -18,6 +18,7 @@ import AylikPerformans from '../../components/AylikPerformans';
 import TeklifSablonu from '../../components/TeklifSablonu';
 import ZiyaretNotu from '../../components/ZiyaretNotu';
 import Kartvizit from '../../components/Kartvizit';
+import SozlesmeSablonu from '../../components/SozlesmeSablonu';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -36,7 +37,7 @@ interface Lead {
     olusturma_tarihi: string;
 }
 
-type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'services' | 'testimonials' | 'logo_clients' | 'packages' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri';
+type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'services' | 'testimonials' | 'logo_clients' | 'packages' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri' | 'sozlesme_sablonu';
 
 interface TabDef {
     id: TabId;
@@ -66,6 +67,7 @@ const TABS: TabDef[] = [
     { id: 'teklif_sablonu', label: 'Teklif / Sözleşme', icon: FileText, group: 'Belgeler' },
     { id: 'ziyaret_notu', label: 'Ziyaret Notu', icon: ClipboardList, group: 'Belgeler' },
     { id: 'kartvizit', label: 'Kartvizit (PDF)', icon: CreditCard, group: 'Belgeler' },
+    { id: 'sozlesme_sablonu', label: 'Sözleşmeler', icon: Scale, group: 'Belgeler' },
     { id: 'yayin_bilgileri', label: 'Yayın Bilgileri', icon: Server, group: 'Sistem' },
 ];
 
@@ -363,6 +365,7 @@ export default function AdminPage() {
                     {activeTab === 'ziyaret_notu' && <ZiyaretNotu />}
                     {activeTab === 'egitim_seti' && <EgitimSeti />}
                     {activeTab === 'kartvizit' && <Kartvizit />}
+                    {activeTab === 'sozlesme_sablonu' && <SozlesmeSablonu />}
                     {activeTab === 'yayin_bilgileri' && <YayinBilgileri />}
                 </div>
             </main>
