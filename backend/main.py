@@ -14,6 +14,8 @@ from collections import defaultdict
 import time
 from pathlib import Path
 from dotenv import load_dotenv
+import threading
+import httpx
 
 # .env dosyasını yükle (şifre vb. burada)
 load_dotenv()
@@ -45,6 +47,29 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ─── Keep-alive: Render ücretsiz planda uyuma engelleyici ───
+RENDER_URL = os.getenv("RENDER_EXTERNAL_URL", "")
+
+def keep_alive():
+    """Her 14 dakikada backend'e ping atarak uyumasını engeller."""
+    while True:
+        time.sleep(14 * 60)  # 14 dakika
+        if RENDER_URL:
+            try:
+                httpx.get(f"{RENDER_URL}/health", timeout=10)
+            except Exception:
+                pass
+
+@app.on_event("startup")
+async def start_keep_alive():
+    if RENDER_URL:
+        thread = threading.Thread(target=keep_alive, daemon=True)
+        thread.start()
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "timestamp": datetime.now().isoformat()}
 
 # Rate limiter (in-memory)
 rate_limit_store: dict[str, list[float]] = defaultdict(list)
