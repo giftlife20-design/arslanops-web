@@ -35,6 +35,8 @@ PRODUCTION_ORIGIN = os.getenv("PRODUCTION_ORIGIN", "")
 cors_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
 if PRODUCTION_ORIGIN:
     cors_origins.append(PRODUCTION_ORIGIN)
+# Custom domain origins
+cors_origins.extend(["https://arslanops.com", "https://www.arslanops.com"])
 
 app.add_middleware(
     CORSMiddleware,
