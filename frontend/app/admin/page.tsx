@@ -1351,6 +1351,7 @@ function ComparisonEditor({ data, onSave, saving }: { data: any; onSave: (d: any
 // ─── About Editor ───
 const DEFAULT_ABOUT = {
     heading: { badge: 'Biz Kimiz', title: 'Hakkımızda' },
+    founder: { subtitle: 'Coffee & Restoran Operasyon Uzmanı', statLabel1: 'Yıl Deneyim', statLabel2: 'Proje', statLabel3: 'Coffee & Restoran', statLabel3sub: 'Uzmanlık Alanı' },
     methodology: {
         title: 'ArslanOps Metodolojisi',
         subtitle: '90 günlük aşamalı yaklaşım: Teşhisten iyileştirmeye, sürdürülebilir operasyonel mükemmellik',
@@ -1368,42 +1369,49 @@ function AboutEditor({ data, onSave, saving }: { data: any; onSave: (d: any) => 
     useEffect(() => { if (data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0) setLocal(data); }, [data]);
 
     const updateStep = (i: number, key: string, val: string) => {
-        const items = [...(local.steps || [])];
+        const items = [...(local.steps || DEFAULT_ABOUT.steps)];
         items[i] = { ...items[i], [key]: val };
         setLocal({ ...local, steps: items });
     };
+    const updateFounder = (key: string, val: string) => setLocal({ ...local, founder: { ...(local.founder || DEFAULT_ABOUT.founder), [key]: val } });
 
     return (
         <div>
             {/* Bölüm Başlığı */}
             <EditorCard title="📌 Bölüm Başlığı">
-                <InputField label="Üst Etiket" value={local.heading?.badge || ''} onChange={(v: string) => setLocal({ ...local, heading: { ...(local.heading || {}), badge: v } })} />
-                <InputField label="Ana Başlık" value={local.heading?.title || ''} onChange={(v: string) => setLocal({ ...local, heading: { ...(local.heading || {}), title: v } })} />
+                <InputField label="Üst Etiket" value={local.heading?.badge || DEFAULT_ABOUT.heading.badge} onChange={(v: string) => setLocal({ ...local, heading: { ...(local.heading || {}), badge: v } })} />
+                <InputField label="Ana Başlık" value={local.heading?.title || DEFAULT_ABOUT.heading.title} onChange={(v: string) => setLocal({ ...local, heading: { ...(local.heading || {}), title: v } })} />
+            </EditorCard>
+
+            {/* Kurucu Alt Bilgileri */}
+            <EditorCard title="👤 Kurucu Bölümü Alt Bilgileri">
+                <p className="text-xs text-gray-400 mb-3">Kurucu adı, fotoğraf ve bio "Ekip & Kurucu" sekmesinden düzenlenir. Burada alt etiketler ve istatistik etiketlerini değiştirebilirsiniz.</p>
+                <InputField label="Uzmanlık Alt Başlığı" value={local.founder?.subtitle || DEFAULT_ABOUT.founder.subtitle} onChange={(v: string) => updateFounder('subtitle', v)} />
+                <div className="grid grid-cols-3 gap-3 mt-2">
+                    <InputField label="1. İstatistik Etiketi" value={local.founder?.statLabel1 || DEFAULT_ABOUT.founder.statLabel1} onChange={(v: string) => updateFounder('statLabel1', v)} />
+                    <InputField label="2. İstatistik Etiketi" value={local.founder?.statLabel2 || DEFAULT_ABOUT.founder.statLabel2} onChange={(v: string) => updateFounder('statLabel2', v)} />
+                    <InputField label="3. İstatistik Değeri" value={local.founder?.statLabel3 || DEFAULT_ABOUT.founder.statLabel3} onChange={(v: string) => updateFounder('statLabel3', v)} />
+                </div>
+                <InputField label="3. İstatistik Alt Etiketi" value={local.founder?.statLabel3sub || DEFAULT_ABOUT.founder.statLabel3sub} onChange={(v: string) => updateFounder('statLabel3sub', v)} />
             </EditorCard>
 
             {/* Metodoloji Başlığı */}
             <EditorCard title="🔄 Metodoloji Başlığı">
-                <InputField label="Başlık" value={local.methodology?.title || ''} onChange={(v: string) => setLocal({ ...local, methodology: { ...(local.methodology || {}), title: v } })} />
-                <InputField label="Alt Açıklama" value={local.methodology?.subtitle || ''} onChange={(v: string) => setLocal({ ...local, methodology: { ...(local.methodology || {}), subtitle: v } })} multiline />
+                <InputField label="Başlık" value={local.methodology?.title || DEFAULT_ABOUT.methodology.title} onChange={(v: string) => setLocal({ ...local, methodology: { ...(local.methodology || {}), title: v } })} />
+                <InputField label="Alt Açıklama" value={local.methodology?.subtitle || DEFAULT_ABOUT.methodology.subtitle} onChange={(v: string) => setLocal({ ...local, methodology: { ...(local.methodology || {}), subtitle: v } })} multiline />
             </EditorCard>
 
-            {/* Metodoloji Kartları */}
+            {/* Mevcut 4 Metodoloji Kartı */}
             <h3 className="text-lg font-bold text-[#0B1F3B] mb-3">📋 Metodoloji Kartları</h3>
-            {(local.steps || []).map((step: any, i: number) => (
-                <EditorCard key={i} title={`Adım ${i + 1}: ${step.title || 'Yeni'}`}>
+            {(local.steps || DEFAULT_ABOUT.steps).map((step: any, i: number) => (
+                <EditorCard key={i} title={`Adım ${i + 1}: ${step.title || ''}`}>
                     <div className="grid grid-cols-2 gap-4">
-                        <InputField label="Başlık" value={step.title} onChange={(v: string) => updateStep(i, 'title', v)} />
-                        <InputField label="Süre" value={step.duration} onChange={(v: string) => updateStep(i, 'duration', v)} />
+                        <InputField label="Başlık" value={step.title || ''} onChange={(v: string) => updateStep(i, 'title', v)} />
+                        <InputField label="Süre Etiketi" value={step.duration || ''} onChange={(v: string) => updateStep(i, 'duration', v)} />
                     </div>
-                    <InputField label="Açıklama" value={step.description} onChange={(v: string) => updateStep(i, 'description', v)} multiline />
-                    <button onClick={() => setLocal({ ...local, steps: local.steps.filter((_: any, j: number) => j !== i) })}
-                        className="text-red-400 hover:text-red-600 text-sm flex items-center gap-1"><Trash2 className="w-3 h-3" />Sil</button>
+                    <InputField label="Açıklama" value={step.description || ''} onChange={(v: string) => updateStep(i, 'description', v)} multiline />
                 </EditorCard>
             ))}
-            <button onClick={() => setLocal({ ...local, steps: [...(local.steps || []), { title: '', duration: '', description: '' }] })}
-                className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all mb-6">
-                <Plus className="w-4 h-4" />Adım Ekle
-            </button>
 
             <SaveButton onClick={() => onSave(local)} saving={saving} />
         </div>

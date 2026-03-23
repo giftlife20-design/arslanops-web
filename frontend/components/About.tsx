@@ -57,6 +57,7 @@ export default function About() {
     const [aboutHeading, setAboutHeading] = useState({ badge: 'Biz Kimiz', title: 'Hakkımızda' });
     const [methHeading, setMethHeading] = useState({ title: 'ArslanOps Metodolojisi', subtitle: '90 günlük aşamalı yaklaşım: Teşhisten iyileştirmeye, sürdürülebilir operasyonel mükemmellik' });
     const [steps, setSteps] = useState(METHODOLOGY);
+    const [founderInfo, setFounderInfo] = useState({ subtitle: 'Coffee & Restoran Operasyon Uzmanı', statLabel1: 'Yıl Deneyim', statLabel2: 'Proje', statLabel3: 'Coffee & Restoran', statLabel3sub: 'Uzmanlık Alanı' });
 
     useEffect(() => {
         // Fetch team data
@@ -89,6 +90,7 @@ export default function About() {
                     if (data.heading) setAboutHeading(prev => ({ ...prev, ...data.heading }));
                     if (data.methodology) setMethHeading(prev => ({ ...prev, ...data.methodology }));
                     if (data.steps?.length > 0) setSteps(data.steps.map((s: any, i: number) => ({ ...METHODOLOGY[i], ...s })));
+                    if (data.founder) setFounderInfo(prev => ({ ...prev, ...data.founder }));
                 }
             })
             .catch(() => { });
@@ -169,7 +171,7 @@ export default function About() {
                                 </h3>
                                 <div className="flex items-center gap-2 text-[#C5A55A]/70 text-sm mt-1">
                                     <Coffee className="w-4 h-4" />
-                                    <span>Coffee & Restoran Operasyon Uzmanı</span>
+                                    <span>{founderInfo.subtitle}</span>
                                 </div>
                             </div>
 
@@ -186,15 +188,15 @@ export default function About() {
                                 <div className="flex flex-wrap gap-8">
                                     <div className="group">
                                         <div className="text-3xl font-bold mb-0.5 gold-shimmer" style={{ fontFamily: 'var(--font-heading)' }}>{miniStats.yil}</div>
-                                        <div className="text-xs text-gray-400 group-hover:text-[#C5A55A]/80 transition-colors uppercase tracking-wider">Yıl Deneyim</div>
+                                        <div className="text-xs text-gray-400 group-hover:text-[#C5A55A]/80 transition-colors uppercase tracking-wider">{founderInfo.statLabel1}</div>
                                     </div>
                                     <div className="group">
                                         <div className="text-3xl font-bold mb-0.5 gold-shimmer" style={{ fontFamily: 'var(--font-heading)' }}>{miniStats.proje}</div>
-                                        <div className="text-xs text-gray-400 group-hover:text-[#C5A55A]/80 transition-colors uppercase tracking-wider">Proje</div>
+                                        <div className="text-xs text-gray-400 group-hover:text-[#C5A55A]/80 transition-colors uppercase tracking-wider">{founderInfo.statLabel2}</div>
                                     </div>
                                     <div className="group">
-                                        <div className="text-3xl font-bold text-[#C5A55A] mb-0.5" style={{ fontFamily: 'var(--font-heading)' }}>Coffee & Restoran</div>
-                                        <div className="text-xs text-gray-400 group-hover:text-[#C5A55A]/80 transition-colors uppercase tracking-wider">Uzmanlık Alanı</div>
+                                        <div className="text-3xl font-bold text-[#C5A55A] mb-0.5" style={{ fontFamily: 'var(--font-heading)' }}>{founderInfo.statLabel3}</div>
+                                        <div className="text-xs text-gray-400 group-hover:text-[#C5A55A]/80 transition-colors uppercase tracking-wider">{founderInfo.statLabel3sub}</div>
                                     </div>
                                 </div>
                             </div>
