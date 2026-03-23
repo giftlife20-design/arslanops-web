@@ -140,7 +140,7 @@ export default function Packages() {
                             name: p.name || '',
                             subtitle: p.description || DEFAULT_PACKAGES[idx]?.subtitle || '',
                             startingPrice: p.startingPrice || DEFAULT_PACKAGES[idx]?.startingPrice || '',
-                            services: DEFAULT_PACKAGES[idx]?.services || { cogs: false, ops: false, finance: false, food: false, team: false, opening: false },
+                            services: p.services || DEFAULT_PACKAGES[idx]?.services || { cogs: false, ops: false, finance: false, food: false, team: false, opening: false },
                             deliverables: p.features || DEFAULT_PACKAGES[idx]?.deliverables || [],
                             recommended: p.recommended || false,
                             accent: DEFAULT_PACKAGES[idx]?.accent || '#C5A55A',

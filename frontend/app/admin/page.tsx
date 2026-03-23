@@ -1216,6 +1216,38 @@ function PackagesEditor({ data, onSave, saving, heading, onSaveHeading }: { data
                         <button onClick={() => update(i, 'features', [...(item.features || []), ''])}
                             className="text-sm text-[#C4803D] hover:underline flex items-center gap-1"><Plus className="w-3 h-3" />Özellik Ekle</button>
                     </div>
+
+                    {/* Hizmet Karşılaştırma */}
+                    <div className="mb-4 p-4 rounded-xl border border-blue-200 bg-blue-50/50">
+                        <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                            📊 Hizmet Karşılaştırma Tablosu
+                        </h4>
+                        {['cogs', 'ops', 'finance', 'food', 'team', 'opening'].map((svcKey) => {
+                            const labels: Record<string, string> = { cogs: 'Maliyet Kontrolü & COGS', ops: 'Operasyon & Süreç', finance: 'Finansal Analiz & KPI', food: 'Gıda Güvenliği & Kalite', team: 'Ekip Eğitimi', opening: 'Yeni Açılış' };
+                            const services = item.services || {};
+                            const level = services[svcKey] || false;
+                            return (
+                                <div key={svcKey} className="flex items-center justify-between py-1.5">
+                                    <span className="text-xs text-gray-600">{labels[svcKey]}</span>
+                                    <div className="flex gap-1">
+                                        {(['full', 'basic', false] as const).map((opt) => (
+                                            <button key={String(opt)} onClick={() => {
+                                                const newSvc = { ...services, [svcKey]: opt };
+                                                update(i, 'services', newSvc);
+                                            }}
+                                                className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all ${level === opt
+                                                    ? opt === 'full' ? 'bg-emerald-500 text-white' : opt === 'basic' ? 'bg-amber-500 text-white' : 'bg-gray-500 text-white'
+                                                    : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                                                    }`}>
+                                                {opt === 'full' ? 'Tam' : opt === 'basic' ? 'Temel' : '✕'}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
                     <button onClick={() => setLocal(local.filter((_: any, j: number) => j !== i))}
                         className="text-red-400 hover:text-red-600 text-sm flex items-center gap-1"><Trash2 className="w-3 h-3" />Paketi Sil</button>
                 </EditorCard>
