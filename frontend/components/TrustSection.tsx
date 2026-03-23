@@ -110,7 +110,31 @@ const CERTIFICATIONS = [
 export default function TrustSection() {
     const [isVisible, setIsVisible] = useState(false);
     const [activeCase, setActiveCase] = useState(0);
+    const [heading, setHeading] = useState({ badge: 'Güvenle Çalışın', title: 'Neden Güvenebilirsiniz?', subtitle: 'İşletmenizin bilgileri ve bütçeniz tamamen güvence altında' });
+    const [guarantees, setGuarantees] = useState(GUARANTEES);
+    const [caseStudies, setCaseStudies] = useState(CASE_STUDIES);
+    const [processSteps, setProcessSteps] = useState(PROCESS_STEPS);
+    const [certifications, setCertifications] = useState(CERTIFICATIONS);
     const sectionRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        fetch(`${API_URL}/api/content/trust_heading`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => { if (data && (data.badge || data.title || data.subtitle)) setHeading(prev => ({ ...prev, ...data })); })
+            .catch(() => {});
+        fetch(`${API_URL}/api/content/trust`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data && typeof data === 'object') {
+                    if (data.guarantees?.length > 0) setGuarantees(data.guarantees.map((g: any, i: number) => ({ ...GUARANTEES[i], ...g })));
+                    if (data.caseStudies?.length > 0) setCaseStudies(data.caseStudies.map((cs: any, i: number) => ({ ...CASE_STUDIES[i], ...cs })));
+                    if (data.processSteps?.length > 0) setProcessSteps(data.processSteps.map((s: any, i: number) => ({ ...PROCESS_STEPS[i], ...s })));
+                    if (data.certifications?.length > 0) setCertifications(data.certifications);
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -132,18 +156,18 @@ export default function TrustSection() {
             <div className="section-container py-16 md:py-20">
                 <div className="text-center mb-12">
                     <span className="text-[#C5A55A] font-bold tracking-widest text-sm uppercase mb-2 block">
-                        Güvenle Çalışın
+                        {heading.badge}
                     </span>
                     <h2 className="text-3xl md:text-4xl font-bold mb-4 section-heading section-heading-gold">
-                        Neden Güvenebilirsiniz?
+                        {heading.title}
                     </h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">
-                        İşletmenizin bilgileri ve bütçeniz tamamen güvence altında
+                        {heading.subtitle}
                     </p>
                 </div>
 
                 <div className={`grid md:grid-cols-3 gap-6 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                    {GUARANTEES.map((g, i) => {
+                    {guarantees.map((g, i) => {
                         const Icon = g.icon;
                         return (
                             <div key={i} className="relative group bg-white rounded-2xl p-7 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-500" style={{ transitionDelay: `${i * 100}ms` }}>
@@ -175,7 +199,7 @@ export default function TrustSection() {
 
                 {/* Case Study Tabs */}
                 <div className="flex justify-center gap-3 mb-8">
-                    {CASE_STUDIES.map((cs, i) => (
+                    {caseStudies.map((cs, i) => (
                         <button key={i} onClick={() => setActiveCase(i)}
                             className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${activeCase === i
                                 ? 'bg-[#0B1F3B] text-white shadow-lg'
@@ -192,22 +216,22 @@ export default function TrustSection() {
                         {/* Sol: Problem & Çözüm */}
                         <div className="p-8 md:p-10">
                             <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                                <span className="px-3 py-1 bg-[#C5A55A]/10 text-[#C5A55A] rounded-full font-medium">{CASE_STUDIES[activeCase].business}</span>
+                                <span className="px-3 py-1 bg-[#C5A55A]/10 text-[#C5A55A] rounded-full font-medium">{caseStudies[activeCase].business}</span>
                                 <span>•</span>
-                                <span>{CASE_STUDIES[activeCase].location}</span>
+                                <span>{caseStudies[activeCase].location}</span>
                                 <span>•</span>
                                 <Clock className="w-3.5 h-3.5" />
-                                <span>{CASE_STUDIES[activeCase].duration}</span>
+                                <span>{caseStudies[activeCase].duration}</span>
                             </div>
 
                             <div className="mb-6">
                                 <h4 className="text-xs font-bold text-red-500 uppercase tracking-wider mb-2">Sorun</h4>
-                                <p className="text-gray-700">{CASE_STUDIES[activeCase].problem}</p>
+                                <p className="text-gray-700">{caseStudies[activeCase].problem}</p>
                             </div>
 
                             <div>
                                 <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-2">Çözüm</h4>
-                                <p className="text-gray-700">{CASE_STUDIES[activeCase].solution}</p>
+                                <p className="text-gray-700">{caseStudies[activeCase].solution}</p>
                             </div>
                         </div>
 
@@ -215,7 +239,7 @@ export default function TrustSection() {
                         <div className="bg-gradient-to-br from-[#0B1F3B] to-[#132D52] p-8 md:p-10 flex flex-col justify-center">
                             <h4 className="text-xs font-bold text-[#C5A55A] uppercase tracking-wider mb-6">Sonuçlar</h4>
                             <div className="space-y-5">
-                                {CASE_STUDIES[activeCase].results.map((r, i) => (
+                                {caseStudies[activeCase].results.map((r, i) => (
                                     <div key={i} className="flex items-center gap-4">
                                         <div className="flex-1">
                                             <div className="text-sm text-gray-400 mb-1">{r.label}</div>
@@ -257,12 +281,12 @@ export default function TrustSection() {
                     </div>
 
                     <div className={`grid md:grid-cols-4 gap-6 transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                        {PROCESS_STEPS.map((step, i) => {
+                        {processSteps.map((step, i) => {
                             const Icon = step.icon;
                             return (
                                 <div key={i} className="relative">
                                     {/* Bağlantı çizgisi */}
-                                    {i < PROCESS_STEPS.length - 1 && (
+                                    {i < processSteps.length - 1 && (
                                         <div className="hidden md:block absolute top-10 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-[#C5A55A]/30 to-transparent z-0" />
                                     )}
                                     <div className="relative bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-500 z-10" style={{ transitionDelay: `${i * 120}ms` }}>
@@ -295,7 +319,7 @@ export default function TrustSection() {
                             Profesyonel Yetkinlikler
                         </h3>
                         <div className="space-y-3">
-                            {CERTIFICATIONS.map((cert, i) => (
+                            {certifications.map((cert, i) => (
                                 <div key={i} className="flex items-center gap-3 group">
                                     <div className="w-8 h-8 rounded-lg bg-[#C5A55A]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#C5A55A]/20 transition-colors">
                                         <BadgeCheck className="w-4 h-4 text-[#C5A55A]" />

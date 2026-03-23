@@ -37,7 +37,7 @@ interface Lead {
     olusturma_tarihi: string;
 }
 
-type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'problems' | 'whyus' | 'services' | 'deliverables' | 'portfolio' | 'testimonials' | 'logo_clients' | 'packages' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri' | 'sozlesme_sablonu';
+type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'problems' | 'whyus' | 'services' | 'deliverables' | 'portfolio' | 'trust' | 'testimonials' | 'logo_clients' | 'packages' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri' | 'sozlesme_sablonu';
 
 interface TabDef {
     id: TabId;
@@ -57,6 +57,7 @@ const TABS: TabDef[] = [
     { id: 'services', label: 'Hizmetler', icon: Briefcase, group: 'İçerik Yönetimi' },
     { id: 'deliverables', label: 'Teslim Edilenler', icon: FileText, group: 'İçerik Yönetimi' },
     { id: 'portfolio', label: 'Senaryolar', icon: Briefcase, group: 'İçerik Yönetimi' },
+    { id: 'trust', label: 'Güven Bölümü', icon: Scale, group: 'İçerik Yönetimi' },
     { id: 'testimonials', label: 'Müşteri Yorumları', icon: Quote, group: 'İçerik Yönetimi' },
     { id: 'logo_clients', label: 'Referans Logolar', icon: Image, group: 'İçerik Yönetimi' },
     { id: 'packages', label: 'Paketler', icon: Package, group: 'İçerik Yönetimi' },
@@ -359,6 +360,7 @@ export default function AdminPage() {
                     {activeTab === 'services' && <ServicesEditor data={content.services} onSave={(d: any) => saveSection('services', d)} saving={saving} heading={content.services_heading || {}} onSaveHeading={(d: any) => saveSection('services_heading', d)} />}
                     {activeTab === 'deliverables' && <DeliverablesEditor data={content.deliverables} onSave={(d: any) => saveSection('deliverables', d)} saving={saving} heading={content.deliverables_heading || {}} onSaveHeading={(d: any) => saveSection('deliverables_heading', d)} />}
                     {activeTab === 'portfolio' && <PortfolioEditor data={content.portfolio} onSave={(d: any) => saveSection('portfolio', d)} saving={saving} heading={content.portfolio_heading || {}} onSaveHeading={(d: any) => saveSection('portfolio_heading', d)} authHeader={authHeader} />}
+                    {activeTab === 'trust' && <TrustEditor data={content.trust} onSave={(d: any) => saveSection('trust', d)} saving={saving} heading={content.trust_heading || {}} onSaveHeading={(d: any) => saveSection('trust_heading', d)} />}
                     {activeTab === 'testimonials' && <TestimonialsEditor data={content.testimonials} onSave={(d: any) => saveSection('testimonials', d)} saving={saving} authHeader={authHeader} sectionVisible={content.testimonials_visible !== false} onToggleVisibility={(v: boolean) => saveSection('testimonials_visible', v)} heading={content.testimonials_heading || {}} onSaveHeading={(d: any) => saveSection('testimonials_heading', d)} />}
                     {activeTab === 'logo_clients' && <LogoClientsEditor data={content.logo_clients} onSave={(d: any) => saveSection('logo_clients', d)} saving={saving} authHeader={authHeader} sectionVisible={content.logo_clients_visible !== false} onToggleVisibility={(v: boolean) => saveSection('logo_clients_visible', v)} />}
                     {activeTab === 'packages' && <PackagesEditor data={content.packages} onSave={(d: any) => saveSection('packages', d)} saving={saving} heading={content.packages_heading || {}} onSaveHeading={(d: any) => saveSection('packages_heading', d)} />}
@@ -1452,6 +1454,137 @@ function PortfolioEditor({ data, onSave, saving, heading, onSaveHeading, authHea
                 </button>
                 <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
             </div>
+        </div>
+    );
+}
+
+// ─── Trust Section Editor ───
+const DEFAULT_TRUST = {
+    guarantees: [
+        { title: 'Sözleşme Güvencesi', desc: 'Tüm hizmetler yazılı sözleşmeye bağlıdır. Hak ve yükümlülükler net tanımlanır.' },
+        { title: 'Gizlilik (NDA)', desc: 'İşletme bilgileriniz NDA ile korunur. Verileriniz 3. şahıslarla asla paylaşılmaz.' },
+        { title: 'Sonuç Odaklı Çalışma', desc: 'Ölçülebilir hedefler belirlenir, ilerleme haftalık raporlarla takip edilir.' },
+    ],
+    caseStudies: [
+        { business: 'Restoran Zinciri', location: 'İstanbul', problem: 'COGS oranı %38, fire kayıpları %12', solution: 'Stok takibi, reçete standardizasyonu, satın alma optimizasyonu', duration: '90 gün', results: [{ label: 'COGS', before: '%38', after: '%27' }, { label: 'Fire Oranı', before: '%12', after: '%4' }, { label: 'Kâr Marjı', before: '%8', after: '%19' }] },
+        { business: 'Butik Kafe', location: 'İstanbul', problem: 'Kasa farkları, personel verimsizliği, stok kayıpları', solution: 'Kasa yönetimi, vardiya planlaması, KPI dashboard kurulumu', duration: '60 gün', results: [{ label: 'Kasa Farkı', before: '₺2.800/ay', after: '₺150/ay' }, { label: 'Personel Ver.', before: '%45', after: '%82' }, { label: 'Stok Doğruluk', before: '%68', after: '%96' }] },
+    ],
+    processSteps: [
+        { title: 'Ücretsiz Ön Görüşme', desc: 'İşletmenizi tanırız, sorunları dinler, çözüm yön haritası çizeriz.', duration: '15 dakika' },
+        { title: 'Analiz & Teşhis', desc: 'Yerinde veya online detaylı analiz. SWOT, maliyet, operasyon taraması.', duration: '3-5 gün' },
+        { title: 'Plan & Sözleşme', desc: 'Kişiye özel aksiyon planı hazırlanır, sözleşme imzalanır, paket seçilir.', duration: '1-2 gün' },
+        { title: 'Uygulama & Takip', desc: 'Planları uygularız, haftalık KPI raporları sunarız, sonuçları ölçeriz.', duration: '30-90 gün' },
+    ],
+    certifications: ['25+ Yıl F&B Operasyon Deneyimi', 'COGS & Maliyet Analizi Uzmanlığı', 'SOP & Süreç Tasarımı', 'KPI Dashboard & Raporlama', 'Stok & Satın Alma Yönetimi', 'Personel Verimlilik Analizi'],
+};
+
+function TrustEditor({ data, onSave, saving, heading, onSaveHeading }: { data: any; onSave: (d: any) => void; saving: boolean; heading: any; onSaveHeading: (d: any) => void }) {
+    const [local, setLocal] = useState<any>(data && typeof data === 'object' && !Array.isArray(data) ? data : DEFAULT_TRUST);
+    const [localHeading, setLocalHeading] = useState(heading || {});
+    useEffect(() => { if (data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0) setLocal(data); }, [data]);
+    useEffect(() => { if (heading) setLocalHeading(heading); }, [heading]);
+
+    const updateGuarantee = (i: number, key: string, val: string) => {
+        const items = [...(local.guarantees || [])];
+        items[i] = { ...items[i], [key]: val };
+        setLocal({ ...local, guarantees: items });
+    };
+    const updateStep = (i: number, key: string, val: string) => {
+        const items = [...(local.processSteps || [])];
+        items[i] = { ...items[i], [key]: val };
+        setLocal({ ...local, processSteps: items });
+    };
+    const updateCase = (i: number, key: string, val: any) => {
+        const items = [...(local.caseStudies || [])];
+        items[i] = { ...items[i], [key]: val };
+        setLocal({ ...local, caseStudies: items });
+    };
+    const updateCaseResult = (ci: number, ri: number, key: string, val: string) => {
+        const items = [...(local.caseStudies || [])];
+        const results = [...(items[ci].results || [])];
+        results[ri] = { ...results[ri], [key]: val };
+        items[ci] = { ...items[ci], results };
+        setLocal({ ...local, caseStudies: items });
+    };
+    const updateCert = (i: number, val: string) => {
+        const items = [...(local.certifications || [])];
+        items[i] = val;
+        setLocal({ ...local, certifications: items });
+    };
+
+    return (
+        <div>
+            <SectionHeadingEditor heading={localHeading} onChange={setLocalHeading}
+                defaults={{ badge: 'Güvenle Çalışın', title: 'Neden Güvenebilirsiniz?', subtitle: 'İşletmenizin bilgileri ve bütçeniz tamamen güvence altında' }} />
+
+            {/* Garanti Rozetleri */}
+            <h3 className="text-lg font-bold text-[#0B1F3B] mb-3 mt-6">🛡️ Garanti Rozetleri</h3>
+            {(local.guarantees || []).map((g: any, i: number) => (
+                <EditorCard key={`g${i}`} title={`Rozet ${i + 1}: ${g.title || 'Yeni'}`}>
+                    <InputField label="Başlık" value={g.title} onChange={(v: string) => updateGuarantee(i, 'title', v)} />
+                    <InputField label="Açıklama" value={g.desc} onChange={(v: string) => updateGuarantee(i, 'desc', v)} multiline />
+                    <button onClick={() => setLocal({ ...local, guarantees: local.guarantees.filter((_: any, j: number) => j !== i) })}
+                        className="text-red-400 hover:text-red-600 text-sm flex items-center gap-1"><Trash2 className="w-3 h-3" />Sil</button>
+                </EditorCard>
+            ))}
+            <button onClick={() => setLocal({ ...local, guarantees: [...(local.guarantees || []), { title: '', desc: '' }] })}
+                className="flex items-center gap-2 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all mb-6">
+                <Plus className="w-3 h-3" />Rozet Ekle
+            </button>
+
+            {/* Başarı Hikayeleri */}
+            <h3 className="text-lg font-bold text-[#0B1F3B] mb-3">📊 Başarı Hikayeleri</h3>
+            {(local.caseStudies || []).map((cs: any, i: number) => (
+                <EditorCard key={`cs${i}`} title={`Hikaye ${i + 1}: ${cs.business || 'Yeni'}`}>
+                    <div className="grid grid-cols-3 gap-3">
+                        <InputField label="İşletme" value={cs.business} onChange={(v: string) => updateCase(i, 'business', v)} />
+                        <InputField label="Şehir" value={cs.location} onChange={(v: string) => updateCase(i, 'location', v)} />
+                        <InputField label="Süre" value={cs.duration} onChange={(v: string) => updateCase(i, 'duration', v)} />
+                    </div>
+                    <InputField label="Problem" value={cs.problem} onChange={(v: string) => updateCase(i, 'problem', v)} multiline />
+                    <InputField label="Çözüm" value={cs.solution} onChange={(v: string) => updateCase(i, 'solution', v)} multiline />
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5 mt-2">Sonuçlar</label>
+                    {(cs.results || []).map((r: any, ri: number) => (
+                        <div key={ri} className="flex items-center gap-2 mb-2">
+                            <input value={r.label} onChange={e => updateCaseResult(i, ri, 'label', e.target.value)} placeholder="Metrik" className="w-28 px-2 py-1.5 border border-gray-200 rounded text-sm" />
+                            <input value={r.before} onChange={e => updateCaseResult(i, ri, 'before', e.target.value)} placeholder="Önce" className="w-24 px-2 py-1.5 border border-gray-200 rounded text-sm" />
+                            <span className="text-gray-400">→</span>
+                            <input value={r.after} onChange={e => updateCaseResult(i, ri, 'after', e.target.value)} placeholder="Sonra" className="w-24 px-2 py-1.5 border border-gray-200 rounded text-sm" />
+                            <button onClick={() => { const results = cs.results.filter((_: any, j: number) => j !== ri); updateCase(i, 'results', results); }}
+                                className="text-red-400 hover:text-red-600 p-1"><Trash2 className="w-3 h-3" /></button>
+                        </div>
+                    ))}
+                    <button onClick={() => updateCase(i, 'results', [...(cs.results || []), { label: '', before: '', after: '' }])}
+                        className="text-sm text-[#C4803D] hover:underline flex items-center gap-1"><Plus className="w-3 h-3" />Sonuç Ekle</button>
+                </EditorCard>
+            ))}
+
+            {/* Süreç Adımları */}
+            <h3 className="text-lg font-bold text-[#0B1F3B] mb-3 mt-6">📋 Süreç Adımları</h3>
+            {(local.processSteps || []).map((s: any, i: number) => (
+                <EditorCard key={`s${i}`} title={`Adım ${i + 1}: ${s.title || 'Yeni'}`}>
+                    <InputField label="Başlık" value={s.title} onChange={(v: string) => updateStep(i, 'title', v)} />
+                    <InputField label="Açıklama" value={s.desc} onChange={(v: string) => updateStep(i, 'desc', v)} multiline />
+                    <InputField label="Süre" value={s.duration} onChange={(v: string) => updateStep(i, 'duration', v)} />
+                </EditorCard>
+            ))}
+
+            {/* Sertifikalar */}
+            <h3 className="text-lg font-bold text-[#0B1F3B] mb-3 mt-6">🏅 Uzmanlık Alanları</h3>
+            {(local.certifications || []).map((cert: string, i: number) => (
+                <div key={i} className="flex items-center gap-2 mb-2">
+                    <input value={cert} onChange={e => updateCert(i, e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#C4803D]" />
+                    <button onClick={() => setLocal({ ...local, certifications: local.certifications.filter((_: any, j: number) => j !== i) })}
+                        className="text-red-400 hover:text-red-600 p-1"><Trash2 className="w-3 h-3" /></button>
+                </div>
+            ))}
+            <button onClick={() => setLocal({ ...local, certifications: [...(local.certifications || []), ''] })}
+                className="flex items-center gap-2 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all mb-6">
+                <Plus className="w-3 h-3" />Uzmanlık Ekle
+            </button>
+
+            <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
         </div>
     );
 }
