@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import { Shield, Zap, HeartHandshake, Target, Clock, Award } from 'lucide-react';
@@ -38,7 +38,30 @@ const REASONS = [
 
 export default function WhyUs() {
     const [isVisible, setIsVisible] = useState(false);
+    const [heading, setHeading] = useState({ badge: 'Neden Biz?', title: 'Neden ArslanOps?', subtitle: 'Operasyonel mükemmellik için neden bizi tercih etmelisiniz?' });
+    const [reasons, setReasons] = useState(REASONS);
     const sectionRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        fetch(`${API_URL}/api/content/whyus_heading`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => { if (data && (data.badge || data.title || data.subtitle)) setHeading(prev => ({ ...prev, ...data })); })
+            .catch(() => {});
+        fetch(`${API_URL}/api/content/whyus`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data && Array.isArray(data) && data.length > 0) {
+                    const merged = data.map((item: any, i: number) => ({
+                        ...REASONS[i],
+                        title: item.title || REASONS[i]?.title || '',
+                        description: item.description || REASONS[i]?.description || '',
+                    }));
+                    setReasons(merged);
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -70,18 +93,18 @@ export default function WhyUs() {
             <div className="section-container relative z-10">
                 <div className="text-center mb-14">
                     <span className="text-[#C5A55A] font-bold tracking-widest text-sm uppercase mb-2 block">
-                        Neden Biz?
+                        {heading.badge}
                     </span>
                     <h2 className="text-3xl md:text-4xl font-bold mb-6 section-heading section-heading-gold">
-                        Neden ArslanOps?
+                        {heading.title}
                     </h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">
-                        Operasyonel mükemmellik için neden bizi tercih etmelisiniz?
+                        {heading.subtitle}
                     </p>
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {REASONS.map((reason, index) => {
+                    {reasons.map((reason, index) => {
                         const Icon = reason.icon;
                         return (
                             <div
