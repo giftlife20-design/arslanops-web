@@ -115,6 +115,9 @@ export default function TrustSection() {
     const [caseStudies, setCaseStudies] = useState(CASE_STUDIES);
     const [processSteps, setProcessSteps] = useState(PROCESS_STEPS);
     const [certifications, setCertifications] = useState(CERTIFICATIONS);
+    const [caseH, setCaseH] = useState({ badge: 'Kanıtlanmış Sonuçlar', title: 'Gerçek Başarı Hikayeleri', subtitle: 'Danışmanlık hizmetimiz ile somut sonuçlar elde eden işletmelerden örnekler' });
+    const [processH, setProcessH] = useState({ badge: 'Nasıl Çalışıyoruz?', title: '4 Adımda Dönüşüm', subtitle: 'Şeffaf, adım adım ilerleyen bir süreç — her aşamada sizi bilgilendiriyoruz' });
+    const [certH, setCertH] = useState({ badge: 'Uzmanlık Alanları', title: 'Profesyonel Yetkinlikler' });
     const sectionRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -131,6 +134,9 @@ export default function TrustSection() {
                     if (data.caseStudies?.length > 0) setCaseStudies(data.caseStudies.map((cs: any, i: number) => ({ ...CASE_STUDIES[i], ...cs })));
                     if (data.processSteps?.length > 0) setProcessSteps(data.processSteps.map((s: any, i: number) => ({ ...PROCESS_STEPS[i], ...s })));
                     if (data.certifications?.length > 0) setCertifications(data.certifications);
+                    if (data.caseHeading) setCaseH(prev => ({ ...prev, ...data.caseHeading }));
+                    if (data.processHeading) setProcessH(prev => ({ ...prev, ...data.processHeading }));
+                    if (data.certHeading) setCertH(prev => ({ ...prev, ...data.certHeading }));
                 }
             })
             .catch(() => {});
@@ -187,13 +193,13 @@ export default function TrustSection() {
             <div className="section-container py-16 md:py-20">
                 <div className="text-center mb-12">
                     <span className="text-[#C5A55A] font-bold tracking-widest text-sm uppercase mb-2 block">
-                        Kanıtlanmış Sonuçlar
+                        {caseH.badge}
                     </span>
                     <h2 className="text-3xl md:text-4xl font-bold mb-4 section-heading section-heading-gold">
-                        Gerçek Başarı Hikayeleri
+                        {caseH.title}
                     </h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">
-                        Danışmanlık hizmetimiz ile somut sonuçlar elde eden işletmelerden örnekler
+                        {caseH.subtitle}
                     </p>
                 </div>
 
@@ -270,13 +276,13 @@ export default function TrustSection() {
                 <div className="section-container">
                     <div className="text-center mb-14">
                         <span className="text-[#C5A55A] font-bold tracking-widest text-sm uppercase mb-2 block">
-                            Nasıl Çalışıyoruz?
+                            {processH.badge}
                         </span>
                         <h2 className="text-3xl md:text-4xl font-bold mb-4 section-heading section-heading-gold">
-                            4 Adımda Dönüşüm
+                            {processH.title}
                         </h2>
                         <p className="text-gray-600 max-w-2xl mx-auto">
-                            Şeffaf, adım adım ilerleyen bir süreç — her aşamada sizi bilgilendiriyoruz
+                            {processH.subtitle}
                         </p>
                     </div>
 
@@ -313,10 +319,10 @@ export default function TrustSection() {
                     {/* Sol: Sertifikalar */}
                     <div className={`transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
                         <span className="text-[#C5A55A] font-bold tracking-widest text-sm uppercase mb-2 block">
-                            Uzmanlık Alanları
+                            {certH.badge}
                         </span>
                         <h3 className="text-2xl md:text-3xl font-bold text-[#0B1F3B] mb-6">
-                            Profesyonel Yetkinlikler
+                            {certH.title}
                         </h3>
                         <div className="space-y-3">
                             {certifications.map((cert, i) => (

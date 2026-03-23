@@ -1534,6 +1534,11 @@ function TrustEditor({ data, onSave, saving, heading, onSaveHeading }: { data: a
 
             {/* Başarı Hikayeleri */}
             <h3 className="text-lg font-bold text-[#0B1F3B] mb-3">📊 Başarı Hikayeleri</h3>
+            <div className="grid grid-cols-3 gap-3 mb-4 p-4 bg-gray-50 rounded-xl">
+                <InputField label="Üst Etiket" value={local.caseHeading?.badge || 'Kanıtlanmış Sonuçlar'} onChange={(v: string) => setLocal({ ...local, caseHeading: { ...(local.caseHeading || {}), badge: v } })} />
+                <InputField label="Ana Başlık" value={local.caseHeading?.title || 'Gerçek Başarı Hikayeleri'} onChange={(v: string) => setLocal({ ...local, caseHeading: { ...(local.caseHeading || {}), title: v } })} />
+                <InputField label="Alt Açıklama" value={local.caseHeading?.subtitle || 'Danışmanlık hizmetimiz ile somut sonuçlar elde eden işletmelerden örnekler'} onChange={(v: string) => setLocal({ ...local, caseHeading: { ...(local.caseHeading || {}), subtitle: v } })} />
+            </div>
             {(local.caseStudies || []).map((cs: any, i: number) => (
                 <EditorCard key={`cs${i}`} title={`Hikaye ${i + 1}: ${cs.business || 'Yeni'}`}>
                     <div className="grid grid-cols-3 gap-3">
@@ -1561,6 +1566,11 @@ function TrustEditor({ data, onSave, saving, heading, onSaveHeading }: { data: a
 
             {/* Süreç Adımları */}
             <h3 className="text-lg font-bold text-[#0B1F3B] mb-3 mt-6">📋 Süreç Adımları</h3>
+            <div className="grid grid-cols-3 gap-3 mb-4 p-4 bg-gray-50 rounded-xl">
+                <InputField label="Üst Etiket" value={local.processHeading?.badge || 'Nasıl Çalışıyoruz?'} onChange={(v: string) => setLocal({ ...local, processHeading: { ...(local.processHeading || {}), badge: v } })} />
+                <InputField label="Ana Başlık" value={local.processHeading?.title || '4 Adımda Dönüşüm'} onChange={(v: string) => setLocal({ ...local, processHeading: { ...(local.processHeading || {}), title: v } })} />
+                <InputField label="Alt Açıklama" value={local.processHeading?.subtitle || 'Şeffaf, adım adım ilerleyen bir süreç — her aşamada sizi bilgilendiriyoruz'} onChange={(v: string) => setLocal({ ...local, processHeading: { ...(local.processHeading || {}), subtitle: v } })} />
+            </div>
             {(local.processSteps || []).map((s: any, i: number) => (
                 <EditorCard key={`s${i}`} title={`Adım ${i + 1}: ${s.title || 'Yeni'}`}>
                     <InputField label="Başlık" value={s.title} onChange={(v: string) => updateStep(i, 'title', v)} />
@@ -1571,6 +1581,10 @@ function TrustEditor({ data, onSave, saving, heading, onSaveHeading }: { data: a
 
             {/* Sertifikalar */}
             <h3 className="text-lg font-bold text-[#0B1F3B] mb-3 mt-6">🏅 Uzmanlık Alanları</h3>
+            <div className="grid grid-cols-2 gap-3 mb-4 p-4 bg-gray-50 rounded-xl">
+                <InputField label="Üst Etiket" value={local.certHeading?.badge || 'Uzmanlık Alanları'} onChange={(v: string) => setLocal({ ...local, certHeading: { ...(local.certHeading || {}), badge: v } })} />
+                <InputField label="Ana Başlık" value={local.certHeading?.title || 'Profesyonel Yetkinlikler'} onChange={(v: string) => setLocal({ ...local, certHeading: { ...(local.certHeading || {}), title: v } })} />
+            </div>
             {(local.certifications || []).map((cert: string, i: number) => (
                 <div key={i} className="flex items-center gap-2 mb-2">
                     <input value={cert} onChange={e => updateCert(i, e.target.value)}
