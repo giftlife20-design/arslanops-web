@@ -913,10 +913,19 @@ function StatsEditor({ data, onSave, saving, heading, onSaveHeading }: { data: a
 }
 
 // ─── Services Editor ───
+const DEFAULT_SERVICES = [
+    { title: 'Maliyet Kontrolü & COGS Yönetimi', description: 'Satın alma, fire, ikram ve stok kayıplarını tespit ederek maliyet oranlarını optimize ediyoruz. COGS hedeflerinizi belirliyor ve takip sistemi kuruyoruz.', highlights: ['COGS Analizi', 'Fire Takibi', 'Satın Alma Optimizasyonu'] },
+    { title: 'Operasyon Düzeni & Süreç Kurulumu', description: 'Açılış-kapanış prosedürleri, vardiya düzeni, kontrol listeleri ve süreç akışlarıyla operasyonel mükemmellik sağlıyoruz.', highlights: ['Kontrol Listeleri', 'Süreç Akışı', 'Vardiya Düzeni'] },
+    { title: 'Ekip Eğitimi & Standartlaştırma', description: 'Personel eğitimi, görev tanımları ve sorumluluk matrisleriyle ekibinizi profesyonel seviyeye taşıyoruz.', highlights: ['Personel Eğitimi', 'Görev Tanımları', 'Performans Takibi'] },
+    { title: 'Finansal Analiz & KPI Takibi', description: 'Haftalık ve aylık KPI dashboardları, kasa takibi ve gelir-gider analizleriyle işletmenizin finansal sağlığını kontrol altında tutuyoruz.', highlights: ['KPI Dashboard', 'Kasa Takibi', 'Gelir Analizi'] },
+    { title: 'Yeni Açılış Danışmanlığı', description: 'Sıfırdan işletme açılışında konsept belirleme, ekipman planlaması, menü mühendisliği ve operasyon altyapısı kuruyoruz.', highlights: ['Konsept Planlama', 'Ekipman Listesi', 'Açılış Checklist'] },
+    { title: 'Gıda Güvenliği & Kalite Standartları', description: 'Hijyen protokolleri, saklama koşulları, HACCP temelleri ve kalite kontrol noktalarıyla uluslararası standartlara uygunluk sağlıyoruz.', highlights: ['Hijyen Protokolü', 'HACCP Temelleri', 'Kalite Kontrol'] },
+];
+
 function ServicesEditor({ data, onSave, saving, heading, onSaveHeading }: { data: any; onSave: (d: any) => void; saving: boolean; heading: any; onSaveHeading: (d: any) => void }) {
-    const [local, setLocal] = useState<any[]>(data || []);
+    const [local, setLocal] = useState<any[]>(data && Array.isArray(data) && data.length > 0 ? data : DEFAULT_SERVICES);
     const [localHeading, setLocalHeading] = useState(heading || {});
-    useEffect(() => { if (data) setLocal(data); }, [data]);
+    useEffect(() => { if (data && Array.isArray(data) && data.length > 0) setLocal(data); }, [data]);
     useEffect(() => { if (heading) setLocalHeading(heading); }, [heading]);
 
     const update = (i: number, key: string, value: any) => {

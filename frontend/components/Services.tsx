@@ -53,12 +53,28 @@ const SERVICES = [
 export default function Services() {
     const [isVisible, setIsVisible] = useState(false);
     const [heading, setHeading] = useState({ badge: 'Hizmetlerimiz', title: 'İşletmenize Özel Çözümler', subtitle: 'Coffee ve restoran sektöründe operasyonel mükemmellik için kapsamlı danışmanlık hizmetleri' });
+    const [services, setServices] = useState(SERVICES);
     const sectionRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/content/services_heading`)
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        fetch(`${API_URL}/api/content/services_heading`)
             .then(r => r.ok ? r.json() : null)
             .then(data => { if (data && (data.badge || data.title || data.subtitle)) setHeading(prev => ({ ...prev, ...data })); })
+            .catch(() => {});
+        fetch(`${API_URL}/api/content/services`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data && Array.isArray(data) && data.length > 0) {
+                    const merged = data.map((item: any, i: number) => ({
+                        ...SERVICES[i],
+                        title: item.title || SERVICES[i]?.title || '',
+                        description: item.description || SERVICES[i]?.description || '',
+                        highlights: item.highlights || SERVICES[i]?.highlights || [],
+                    }));
+                    setServices(merged);
+                }
+            })
             .catch(() => {});
     }, []);
 
@@ -103,7 +119,7 @@ export default function Services() {
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                    {SERVICES.map((service, index) => {
+                    {services.map((service, index) => {
                         const Icon = service.icon;
                         return (
                             <div
