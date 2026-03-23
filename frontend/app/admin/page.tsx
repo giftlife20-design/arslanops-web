@@ -37,7 +37,7 @@ interface Lead {
     olusturma_tarihi: string;
 }
 
-type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'problems' | 'whyus' | 'services' | 'deliverables' | 'portfolio' | 'trust' | 'testimonials' | 'logo_clients' | 'packages' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri' | 'sozlesme_sablonu';
+type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'problems' | 'whyus' | 'services' | 'deliverables' | 'portfolio' | 'trust' | 'testimonials' | 'logo_clients' | 'packages' | 'comparison' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri' | 'sozlesme_sablonu';
 
 interface TabDef {
     id: TabId;
@@ -61,6 +61,7 @@ const TABS: TabDef[] = [
     { id: 'testimonials', label: 'Müşteri Yorumları', icon: Quote, group: 'İçerik Yönetimi' },
     { id: 'logo_clients', label: 'Referans Logolar', icon: Image, group: 'İçerik Yönetimi' },
     { id: 'packages', label: 'Paketler', icon: Package, group: 'İçerik Yönetimi' },
+    { id: 'comparison', label: 'Karşılaştırma Tablosu', icon: BarChart3, group: 'İçerik Yönetimi' },
     { id: 'faq', label: 'SSS', icon: HelpCircle, group: 'İçerik Yönetimi' },
     { id: 'team', label: 'Ekip & Kurucu', icon: Users2, group: 'İçerik Yönetimi' },
     { id: 'footer', label: 'Footer & Sosyal', icon: Settings, group: 'İçerik Yönetimi' },
@@ -364,6 +365,7 @@ export default function AdminPage() {
                     {activeTab === 'testimonials' && <TestimonialsEditor data={content.testimonials} onSave={(d: any) => saveSection('testimonials', d)} saving={saving} authHeader={authHeader} sectionVisible={content.testimonials_visible !== false} onToggleVisibility={(v: boolean) => saveSection('testimonials_visible', v)} heading={content.testimonials_heading || {}} onSaveHeading={(d: any) => saveSection('testimonials_heading', d)} />}
                     {activeTab === 'logo_clients' && <LogoClientsEditor data={content.logo_clients} onSave={(d: any) => saveSection('logo_clients', d)} saving={saving} authHeader={authHeader} sectionVisible={content.logo_clients_visible !== false} onToggleVisibility={(v: boolean) => saveSection('logo_clients_visible', v)} />}
                     {activeTab === 'packages' && <PackagesEditor data={content.packages} onSave={(d: any) => saveSection('packages', d)} saving={saving} heading={content.packages_heading || {}} onSaveHeading={(d: any) => saveSection('packages_heading', d)} />}
+                    {activeTab === 'comparison' && <ComparisonEditor data={content.comparison} onSave={(d: any) => saveSection('comparison', d)} saving={saving} />}
                     {activeTab === 'faq' && <FAQEditor data={content.faq} onSave={(d: any) => saveSection('faq', d)} saving={saving} heading={content.faq_heading || {}} onSaveHeading={(d: any) => saveSection('faq_heading', d)} />}
                     {activeTab === 'team' && <TeamEditor data={content.team} onSave={(d: any) => saveSection('team', d)} saving={saving} authHeader={authHeader} />}
                     {activeTab === 'footer' && <FooterEditor data={content.footer} onSave={(d: any) => saveSection('footer', d)} saving={saving} />}
@@ -1259,6 +1261,87 @@ function PackagesEditor({ data, onSave, saving, heading, onSaveHeading }: { data
                 </button>
                 <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
             </div>
+        </div>
+    );
+}
+
+// ─── Comparison Table Editor ───
+const DEFAULT_COMPARISON = {
+    heading: { title: 'Paket Karşılaştırma Tablosu', subtitle: 'Hangi hizmet hangi pakette? Hızlıca karşılaştırın.' },
+    serviceLabels: [
+        { key: 'cogs', label: 'Maliyet Kontrolü & COGS' },
+        { key: 'ops', label: 'Operasyon & Süreç Kurulumu' },
+        { key: 'finance', label: 'Finansal Analiz & KPI' },
+        { key: 'food', label: 'Gıda Güvenliği & Kalite' },
+        { key: 'team', label: 'Ekip Eğitimi & Standartlaştırma' },
+        { key: 'opening', label: 'Yeni Açılış Danışmanlığı' },
+    ],
+    pricingNote: {
+        title: 'Fiyat Nasıl Belirlenir?',
+        description: 'Yukarıdaki fiyatlar tek şubeli küçük işletmeler için başlangıç fiyatlarıdır. Nihai fiyat aşağıdaki faktörlere göre belirlenir:',
+        factors: ['🏪 Şube Sayısı', '👥 Ekip Büyüklüğü', '📋 Hizmet Kapsamı'],
+        footnote: 'Size özel fiyat teklifi için ücretsiz ön görüşme yapabilirsiniz.',
+    },
+};
+
+function ComparisonEditor({ data, onSave, saving }: { data: any; onSave: (d: any) => void; saving: boolean }) {
+    const [local, setLocal] = useState<any>(data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0 ? data : DEFAULT_COMPARISON);
+    useEffect(() => { if (data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0) setLocal(data); }, [data]);
+
+    const updateHeading = (key: string, val: string) => setLocal({ ...local, heading: { ...(local.heading || {}), [key]: val } });
+    const updateLabel = (i: number, val: string) => {
+        const items = [...(local.serviceLabels || [])];
+        items[i] = { ...items[i], label: val };
+        setLocal({ ...local, serviceLabels: items });
+    };
+    const updatePricing = (key: string, val: any) => setLocal({ ...local, pricingNote: { ...(local.pricingNote || {}), [key]: val } });
+    const updateFactor = (i: number, val: string) => {
+        const items = [...(local.pricingNote?.factors || [])];
+        items[i] = val;
+        setLocal({ ...local, pricingNote: { ...(local.pricingNote || {}), factors: items } });
+    };
+
+    return (
+        <div>
+            {/* Tablo Başlığı */}
+            <EditorCard title="📊 Tablo Başlığı">
+                <InputField label="Ana Başlık" value={local.heading?.title || ''} onChange={(v: string) => updateHeading('title', v)} />
+                <InputField label="Alt Açıklama" value={local.heading?.subtitle || ''} onChange={(v: string) => updateHeading('subtitle', v)} />
+            </EditorCard>
+
+            {/* Hizmet Satır İsimleri */}
+            <EditorCard title="📋 Hizmet Satır İsimleri">
+                <p className="text-xs text-gray-400 mb-3">Karşılaştırma tablosundaki satır isimlerini düzenleyin</p>
+                {(local.serviceLabels || []).map((svc: any, i: number) => (
+                    <div key={i} className="flex items-center gap-3 mb-2">
+                        <span className="text-xs text-gray-400 w-16 flex-shrink-0">{svc.key}</span>
+                        <input value={svc.label} onChange={e => updateLabel(i, e.target.value)}
+                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#C4803D] transition-all" />
+                    </div>
+                ))}
+            </EditorCard>
+
+            {/* Fiyatlandırma Bilgi Notu */}
+            <EditorCard title="💰 Fiyatlandırma Bilgi Notu">
+                <InputField label="Başlık" value={local.pricingNote?.title || ''} onChange={(v: string) => updatePricing('title', v)} />
+                <InputField label="Açıklama" value={local.pricingNote?.description || ''} onChange={(v: string) => updatePricing('description', v)} multiline />
+                <label className="block text-sm font-medium text-gray-700 mb-1.5 mt-2">Fiyat Faktörleri</label>
+                {(local.pricingNote?.factors || []).map((f: string, i: number) => (
+                    <div key={i} className="flex items-center gap-2 mb-2">
+                        <input value={f} onChange={e => updateFactor(i, e.target.value)}
+                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#C4803D]" />
+                        <button onClick={() => updatePricing('factors', local.pricingNote.factors.filter((_: any, j: number) => j !== i))}
+                            className="text-red-400 hover:text-red-600 p-1"><Trash2 className="w-3 h-3" /></button>
+                    </div>
+                ))}
+                <button onClick={() => updatePricing('factors', [...(local.pricingNote?.factors || []), ''])}
+                    className="text-sm text-[#C4803D] hover:underline flex items-center gap-1"><Plus className="w-3 h-3" />Faktör Ekle</button>
+                <div className="mt-3">
+                    <InputField label="Alt Not" value={local.pricingNote?.footnote || ''} onChange={(v: string) => updatePricing('footnote', v)} />
+                </div>
+            </EditorCard>
+
+            <SaveButton onClick={() => onSave(local)} saving={saving} />
         </div>
     );
 }

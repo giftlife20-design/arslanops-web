@@ -127,6 +127,14 @@ function ServiceBadge({ level }: { level: 'full' | 'basic' | false }) {
 export default function Packages() {
     const [packages, setPackages] = useState<PackageData[]>(DEFAULT_PACKAGES);
     const [heading, setHeading] = useState({ badge: 'Danışmanlık Paketleri', title: 'Paketler', subtitle: 'İhtiyacınıza göre ölçeklenebilir danışmanlık seçenekleri. Her paketin hangi hizmetleri kapsadığını aşağıda görebilirsiniz.' });
+    const [serviceLabels, setServiceLabels] = useState(ALL_SERVICES.map(s => ({ ...s })));
+    const [compHeading, setCompHeading] = useState({ title: 'Paket Karşılaştırma Tablosu', subtitle: 'Hangi hizmet hangi pakette? Hızlıca karşılaştırın.' });
+    const [pricingNote, setPricingNote] = useState({
+        title: 'Fiyat Nasıl Belirlenir?',
+        description: 'Yukarıdaki fiyatlar tek şubeli küçük işletmeler için başlangıç fiyatlarıdır. Nihai fiyat aşağıdaki faktörlere göre belirlenir:',
+        factors: ['🏪 Şube Sayısı', '👥 Ekip Büyüklüğü', '📋 Hizmet Kapsamı'],
+        footnote: 'Size özel fiyat teklifi için ücretsiz ön görüşme yapabilirsiniz.',
+    });
 
     useEffect(() => {
         fetch(`${API_URL}/api/content/packages`)
@@ -156,6 +164,20 @@ export default function Packages() {
         fetch(`${API_URL}/api/content/packages_heading`)
             .then(r => r.ok ? r.json() : null)
             .then(data => { if (data && (data.badge || data.title || data.subtitle)) setHeading(prev => ({ ...prev, ...data })); })
+            .catch(() => {});
+
+        // Comparison data
+        fetch(`${API_URL}/api/content/comparison`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data && typeof data === 'object') {
+                    if (data.heading) setCompHeading(prev => ({ ...prev, ...data.heading }));
+                    if (data.serviceLabels?.length > 0) {
+                        setServiceLabels(prev => prev.map((s, i) => ({ ...s, label: data.serviceLabels[i]?.label || s.label })));
+                    }
+                    if (data.pricingNote) setPricingNote(prev => ({ ...prev, ...data.pricingNote }));
+                }
+            })
             .catch(() => {});
     }, []);
 
@@ -289,8 +311,8 @@ export default function Packages() {
             {/* ── Karşılaştırma Tablosu (Desktop) ── */}
             <div className="hidden lg:block">
                 <div className="text-center mb-8">
-                    <h3 className="text-xl font-bold text-[#0B1F3B] mb-2">Paket Karşılaştırma Tablosu</h3>
-                    <p className="text-gray-500 text-sm">Hangi hizmet hangi pakette? Hızlıca karşılaştırın.</p>
+                    <h3 className="text-xl font-bold text-[#0B1F3B] mb-2">{compHeading.title}</h3>
+                    <p className="text-gray-500 text-sm">{compHeading.subtitle}</p>
                 </div>
 
                 <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
@@ -316,8 +338,8 @@ export default function Packages() {
                             </tr>
                         </thead>
                         <tbody>
-                            {ALL_SERVICES.map((svc, idx) => {
-                                const Icon = svc.icon;
+                            {serviceLabels.map((svc, idx) => {
+                                const Icon = ALL_SERVICES.find(s => s.key === svc.key)?.icon || DollarSign;
                                 return (
                                     <tr key={svc.key} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/80'} hover:bg-[#C5A55A]/5 transition-colors`}>
                                         <td className="py-4 px-6">
@@ -362,25 +384,22 @@ export default function Packages() {
             <div className="max-w-2xl mx-auto mt-12 bg-gradient-to-r from-[#0B1F3B] to-[#162d50] rounded-2xl p-6 text-center shadow-lg border border-[#C5A55A]/10">
                 <div className="flex items-center justify-center gap-2 mb-3">
                     <svg className="w-5 h-5 text-[#C5A55A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" /></svg>
-                    <span className="text-[#C5A55A] font-bold text-sm">Fiyat Nasıl Belirlenir?</span>
+                    <span className="text-[#C5A55A] font-bold text-sm">{pricingNote.title}</span>
                 </div>
                 <p className="text-gray-300 text-sm mb-3">
-                    Yukarıdaki fiyatlar <span className="text-amber-400 font-semibold">tek şubeli küçük işletmeler</span> için başlangıç fiyatlarıdır.
-                    Nihai fiyat aşağıdaki faktörlere göre belirlenir:
+                    {pricingNote.description.includes('tek şubeli') ? (
+                        <>{pricingNote.description.split('tek şubeli')[0]}<span className="text-amber-400 font-semibold">tek şubeli küçük işletmeler</span>{pricingNote.description.split('küçük işletmeler')[1] || ''}</>
+                    ) : pricingNote.description}
                 </p>
                 <div className="flex flex-wrap justify-center gap-3 mb-4">
-                    <span className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300">
-                        🏪 Şube Sayısı
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300">
-                        👥 Ekip Büyüklüğü
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300">
-                        📋 Hizmet Kapsamı
-                    </span>
+                    {pricingNote.factors.map((f: string, i: number) => (
+                        <span key={i} className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300">
+                            {f}
+                        </span>
+                    ))}
                 </div>
                 <p className="text-gray-400 text-xs">
-                    Size özel fiyat teklifi için ücretsiz ön görüşme yapabilirsiniz.
+                    {pricingNote.footnote}
                 </p>
             </div>
         </section>
