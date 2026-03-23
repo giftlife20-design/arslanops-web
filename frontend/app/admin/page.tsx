@@ -37,7 +37,7 @@ interface Lead {
     olusturma_tarihi: string;
 }
 
-type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'services' | 'testimonials' | 'logo_clients' | 'packages' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri' | 'sozlesme_sablonu';
+type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'problems' | 'services' | 'testimonials' | 'logo_clients' | 'packages' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri' | 'sozlesme_sablonu';
 
 interface TabDef {
     id: TabId;
@@ -52,6 +52,7 @@ const TABS: TabDef[] = [
     { id: 'branding', label: 'Logo & Marka', icon: Paintbrush, group: 'Görsel Ayarlar' },
     { id: 'hero', label: 'Hero / Ana Ekran', icon: Globe, group: 'Görsel Ayarlar' },
     { id: 'stats', label: 'İstatistikler', icon: BarChart3, group: 'İçerik Yönetimi' },
+    { id: 'problems', label: 'Sorunlar', icon: MessageSquare, group: 'İçerik Yönetimi' },
     { id: 'services', label: 'Hizmetler', icon: Briefcase, group: 'İçerik Yönetimi' },
     { id: 'testimonials', label: 'Müşteri Yorumları', icon: Quote, group: 'İçerik Yönetimi' },
     { id: 'logo_clients', label: 'Referans Logolar', icon: Image, group: 'İçerik Yönetimi' },
@@ -350,6 +351,7 @@ export default function AdminPage() {
                     {activeTab === 'branding' && <BrandingEditor data={content.branding} onSave={(d: any) => saveSection('branding', d)} saving={saving} authHeader={authHeader} />}
                     {activeTab === 'hero' && <HeroEditor data={content.hero} onSave={(d: any) => saveSection('hero', d)} saving={saving} authHeader={authHeader} />}
                     {activeTab === 'stats' && <StatsEditor data={content.stats} onSave={(d: any) => saveSection('stats', d)} saving={saving} heading={content.stats_heading || {}} onSaveHeading={(d: any) => saveSection('stats_heading', d)} />}
+                    {activeTab === 'problems' && <ProblemsEditor data={content.problems} onSave={(d: any) => saveSection('problems', d)} saving={saving} heading={content.problems_heading || {}} onSaveHeading={(d: any) => saveSection('problems_heading', d)} />}
                     {activeTab === 'services' && <ServicesEditor data={content.services} onSave={(d: any) => saveSection('services', d)} saving={saving} heading={content.services_heading || {}} onSaveHeading={(d: any) => saveSection('services_heading', d)} />}
                     {activeTab === 'testimonials' && <TestimonialsEditor data={content.testimonials} onSave={(d: any) => saveSection('testimonials', d)} saving={saving} authHeader={authHeader} sectionVisible={content.testimonials_visible !== false} onToggleVisibility={(v: boolean) => saveSection('testimonials_visible', v)} heading={content.testimonials_heading || {}} onSaveHeading={(d: any) => saveSection('testimonials_heading', d)} />}
                     {activeTab === 'logo_clients' && <LogoClientsEditor data={content.logo_clients} onSave={(d: any) => saveSection('logo_clients', d)} saving={saving} authHeader={authHeader} sectionVisible={content.logo_clients_visible !== false} onToggleVisibility={(v: boolean) => saveSection('logo_clients_visible', v)} />}
@@ -1241,6 +1243,42 @@ function FAQEditor({ data, onSave, saving, heading, onSaveHeading }: { data: any
                 <button onClick={() => setLocal([...local, { question: '', answer: '' }])}
                     className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all">
                     <Plus className="w-4 h-4" />Yeni Soru
+                </button>
+                <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
+            </div>
+        </div>
+    );
+}
+
+// ─── Problems Editor ───
+function ProblemsEditor({ data, onSave, saving, heading, onSaveHeading }: { data: any; onSave: (d: any) => void; saving: boolean; heading: any; onSaveHeading: (d: any) => void }) {
+    const [local, setLocal] = useState<any[]>(data || []);
+    const [localHeading, setLocalHeading] = useState(heading || {});
+    useEffect(() => { if (data) setLocal(data); }, [data]);
+    useEffect(() => { if (heading) setLocalHeading(heading); }, [heading]);
+
+    const update = (i: number, key: string, value: string) => {
+        const items = [...local];
+        items[i] = { ...items[i], [key]: value };
+        setLocal(items);
+    };
+
+    return (
+        <div>
+            <SectionHeadingEditor heading={localHeading} onChange={setLocalHeading}
+                defaults={{ badge: 'Sık Karşılaşılan Sorunlar', title: 'Bu Sorunlar Tanıdık Geldi mi?', subtitle: 'İşletmelerin en sık karşılaştığı operasyonel problemler ve kontrol eksiklikleri' }} />
+            {local.map((item: any, i: number) => (
+                <EditorCard key={i} title={`Sorun ${i + 1}`}>
+                    <InputField label="Başlık" value={item.title} onChange={(v: string) => update(i, 'title', v)} />
+                    <InputField label="Açıklama" value={item.description} onChange={(v: string) => update(i, 'description', v)} multiline />
+                    <button onClick={() => setLocal(local.filter((_: any, j: number) => j !== i))}
+                        className="text-red-400 hover:text-red-600 text-sm flex items-center gap-1"><Trash2 className="w-3 h-3" />Sorunu Sil</button>
+                </EditorCard>
+            ))}
+            <div className="flex items-center gap-4">
+                <button onClick={() => setLocal([...local, { title: '', description: '' }])}
+                    className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all">
+                    <Plus className="w-4 h-4" />Yeni Sorun
                 </button>
                 <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
             </div>

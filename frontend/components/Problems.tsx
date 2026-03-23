@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, TrendingDown, Users, DollarSign, ClipboardX, Eye } from 'lucide-react';
@@ -289,7 +289,32 @@ const PROBLEMS = [
 
 export default function Problems() {
     const [isVisible, setIsVisible] = useState(false);
+    const [heading, setHeading] = useState({ badge: 'Sık Karşılaşılan Sorunlar', title: 'Bu Sorunlar Tanıdık Geldi mi?', subtitle: 'İşletmelerin en sık karşılaştığı operasyonel problemler ve kontrol eksiklikleri' });
+    const [problems, setProblems] = useState(PROBLEMS);
     const sectionRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        // Heading
+        fetch(`${API_URL}/api/content/problems_heading`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => { if (data && (data.badge || data.title || data.subtitle)) setHeading(prev => ({ ...prev, ...data })); })
+            .catch(() => {});
+        // Sorun verileri
+        fetch(`${API_URL}/api/content/problems`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data && Array.isArray(data) && data.length > 0) {
+                    const merged = data.map((item: any, i: number) => ({
+                        ...PROBLEMS[i],
+                        title: item.title || PROBLEMS[i]?.title || '',
+                        description: item.description || PROBLEMS[i]?.description || '',
+                    }));
+                    setProblems(merged);
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -312,18 +337,18 @@ export default function Problems() {
         <section ref={sectionRef} className="section-container bg-white">
             <div className="text-center mb-14">
                 <span className="text-[#C5A55A] font-bold tracking-widest text-sm uppercase mb-2 block">
-                    Sık Karşılaşılan Sorunlar
+                    {heading.badge}
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 section-heading section-heading-gold">
-                    Bu Sorunlar Tanıdık Geldi mi?
+                    {heading.title}
                 </h2>
                 <p className="text-gray-600 max-w-2xl mx-auto">
-                    İşletmelerin en sık karşılaştığı operasyonel problemler ve kontrol eksiklikleri
+                    {heading.subtitle}
                 </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {PROBLEMS.map((problem, index) => {
+                {problems.map((problem, index) => {
                     const Icon = problem.icon;
                     const AnimBg = ANIMATION_MAP[problem.animKey];
                     return (
