@@ -1251,10 +1251,19 @@ function FAQEditor({ data, onSave, saving, heading, onSaveHeading }: { data: any
 }
 
 // ─── Problems Editor ───
+const DEFAULT_PROBLEMS = [
+    { title: 'Maliyet Kontrolsüzlüğü', description: 'COGS oranları %35-40 üstüne çıktı ama sebebi tespit edilemiyor. Fire, ikram ve stok kayıpları görünür değil.' },
+    { title: 'Süreç Eksikliği', description: 'Açılış-kapanış prosedürü yok, kontrol listesi yok, vardiya geçişlerinde bilgi kaybı yaşanıyor.' },
+    { title: 'Ekip Düzensizliği', description: 'Görev tanımları belirsiz, sorumluluklar çakışıyor, personel verimsiz çalışıyor.' },
+    { title: 'Kasa Takip Problemi', description: 'Günlük kasa kapanışları yapılmıyor, gelir-gider takibi eksik, nakit akışı kontrol dışı.' },
+    { title: 'Görünürlük Eksikliği', description: 'KPI yok, dashboard yok, haftalık-aylık karşılaştırma yapılamıyor. Kararlar sezgiye dayalı.' },
+    { title: 'Yeni Açılış Belirsizliği', description: 'Konsept, ekipman, menü ve operasyon planı olmadan açılış yapılıyor, ilk 6 ayda ciddi kayıplar yaşanıyor.' },
+];
+
 function ProblemsEditor({ data, onSave, saving, heading, onSaveHeading }: { data: any; onSave: (d: any) => void; saving: boolean; heading: any; onSaveHeading: (d: any) => void }) {
-    const [local, setLocal] = useState<any[]>(data || []);
+    const [local, setLocal] = useState<any[]>(data && Array.isArray(data) && data.length > 0 ? data : DEFAULT_PROBLEMS);
     const [localHeading, setLocalHeading] = useState(heading || {});
-    useEffect(() => { if (data) setLocal(data); }, [data]);
+    useEffect(() => { if (data && Array.isArray(data) && data.length > 0) setLocal(data); }, [data]);
     useEffect(() => { if (heading) setLocalHeading(heading); }, [heading]);
 
     const update = (i: number, key: string, value: string) => {
@@ -1268,7 +1277,7 @@ function ProblemsEditor({ data, onSave, saving, heading, onSaveHeading }: { data
             <SectionHeadingEditor heading={localHeading} onChange={setLocalHeading}
                 defaults={{ badge: 'Sık Karşılaşılan Sorunlar', title: 'Bu Sorunlar Tanıdık Geldi mi?', subtitle: 'İşletmelerin en sık karşılaştığı operasyonel problemler ve kontrol eksiklikleri' }} />
             {local.map((item: any, i: number) => (
-                <EditorCard key={i} title={`Sorun ${i + 1}`}>
+                <EditorCard key={i} title={`Sorun ${i + 1}: ${item.title || 'Yeni'}`}>
                     <InputField label="Başlık" value={item.title} onChange={(v: string) => update(i, 'title', v)} />
                     <InputField label="Açıklama" value={item.description} onChange={(v: string) => update(i, 'description', v)} multiline />
                     <button onClick={() => setLocal(local.filter((_: any, j: number) => j !== i))}
