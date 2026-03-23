@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Target, Boxes, Users2, LineChart, ArrowRight, Award, Coffee } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -54,6 +54,9 @@ export default function About() {
     const sectionRef = useRef<HTMLDivElement>(null);
     const [team, setTeam] = useState<TeamData | null>(null);
     const [miniStats, setMiniStats] = useState({ yil: '25+', proje: '15+' });
+    const [aboutHeading, setAboutHeading] = useState({ badge: 'Biz Kimiz', title: 'Hakkımızda' });
+    const [methHeading, setMethHeading] = useState({ title: 'ArslanOps Metodolojisi', subtitle: '90 günlük aşamalı yaklaşım: Teşhisten iyileştirmeye, sürdürülebilir operasyonel mükemmellik' });
+    const [steps, setSteps] = useState(METHODOLOGY);
 
     useEffect(() => {
         // Fetch team data
@@ -74,6 +77,18 @@ export default function About() {
                         yil: yilStat ? `${yilStat.value}${yilStat.suffix || ''}` : '25+',
                         proje: projeStat ? `${projeStat.value}${projeStat.suffix || ''}` : '15+'
                     });
+                }
+            })
+            .catch(() => { });
+
+        // About content
+        fetch(`${API_URL}/api/content/about`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data && typeof data === 'object') {
+                    if (data.heading) setAboutHeading(prev => ({ ...prev, ...data.heading }));
+                    if (data.methodology) setMethHeading(prev => ({ ...prev, ...data.methodology }));
+                    if (data.steps?.length > 0) setSteps(data.steps.map((s: any, i: number) => ({ ...METHODOLOGY[i], ...s })));
                 }
             })
             .catch(() => { });
@@ -106,10 +121,10 @@ export default function About() {
             <div className="max-w-5xl mx-auto relative z-10">
                 <div className="text-center mb-14">
                     <span className="text-[#C5A55A] font-bold tracking-widest text-sm uppercase mb-2 block">
-                        Biz Kimiz
+                        {aboutHeading.badge}
                     </span>
                     <h2 className="text-3xl md:text-4xl font-bold mb-6 section-heading section-heading-gold">
-                        Hakkımızda
+                        {aboutHeading.title}
                     </h2>
                     <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-[#C5A55A] to-transparent mx-auto rounded-full"></div>
                 </div>
@@ -233,14 +248,14 @@ export default function About() {
                 {/* ── Methodology ── */}
                 <div>
                     <h3 className="text-2xl font-bold text-center mb-4">
-                        ArslanOps Metodolojisi
+                        {methHeading.title}
                     </h3>
                     <p className="text-center text-gray-300 mb-10 max-w-3xl mx-auto">
-                        90 günlük aşamalı yaklaşım: Teşhisten iyileştirmeye, sürdürülebilir operasyonel mükemmellik
+                        {methHeading.subtitle}
                     </p>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {METHODOLOGY.map((step, index) => {
+                        {steps.map((step, index) => {
                             const Icon = step.icon;
                             return (
                                 <div
@@ -269,7 +284,7 @@ export default function About() {
                                     </p>
 
                                     {/* Arrow connector (hidden on mobile and last item) */}
-                                    {index < METHODOLOGY.length - 1 && (
+                                    {index < steps.length - 1 && (
                                         <div className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 z-20">
                                             <ArrowRight className="w-5 h-5 text-[#C5A55A]/40" />
                                         </div>

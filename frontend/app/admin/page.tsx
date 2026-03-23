@@ -37,7 +37,7 @@ interface Lead {
     olusturma_tarihi: string;
 }
 
-type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'problems' | 'whyus' | 'services' | 'deliverables' | 'portfolio' | 'trust' | 'testimonials' | 'logo_clients' | 'packages' | 'comparison' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri' | 'sozlesme_sablonu';
+type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'problems' | 'whyus' | 'services' | 'deliverables' | 'portfolio' | 'trust' | 'testimonials' | 'logo_clients' | 'packages' | 'comparison' | 'about' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri' | 'sozlesme_sablonu';
 
 interface TabDef {
     id: TabId;
@@ -62,6 +62,7 @@ const TABS: TabDef[] = [
     { id: 'logo_clients', label: 'Referans Logolar', icon: Image, group: 'İçerik Yönetimi' },
     { id: 'packages', label: 'Paketler', icon: Package, group: 'İçerik Yönetimi' },
     { id: 'comparison', label: 'Karşılaştırma Tablosu', icon: BarChart3, group: 'İçerik Yönetimi' },
+    { id: 'about', label: 'Hakkımızda', icon: Users2, group: 'İçerik Yönetimi' },
     { id: 'faq', label: 'SSS', icon: HelpCircle, group: 'İçerik Yönetimi' },
     { id: 'team', label: 'Ekip & Kurucu', icon: Users2, group: 'İçerik Yönetimi' },
     { id: 'footer', label: 'Footer & Sosyal', icon: Settings, group: 'İçerik Yönetimi' },
@@ -366,6 +367,7 @@ export default function AdminPage() {
                     {activeTab === 'logo_clients' && <LogoClientsEditor data={content.logo_clients} onSave={(d: any) => saveSection('logo_clients', d)} saving={saving} authHeader={authHeader} sectionVisible={content.logo_clients_visible !== false} onToggleVisibility={(v: boolean) => saveSection('logo_clients_visible', v)} />}
                     {activeTab === 'packages' && <PackagesEditor data={content.packages} onSave={(d: any) => saveSection('packages', d)} saving={saving} heading={content.packages_heading || {}} onSaveHeading={(d: any) => saveSection('packages_heading', d)} />}
                     {activeTab === 'comparison' && <ComparisonEditor data={content.comparison} onSave={(d: any) => saveSection('comparison', d)} saving={saving} />}
+                    {activeTab === 'about' && <AboutEditor data={content.about} onSave={(d: any) => saveSection('about', d)} saving={saving} />}
                     {activeTab === 'faq' && <FAQEditor data={content.faq} onSave={(d: any) => saveSection('faq', d)} saving={saving} heading={content.faq_heading || {}} onSaveHeading={(d: any) => saveSection('faq_heading', d)} />}
                     {activeTab === 'team' && <TeamEditor data={content.team} onSave={(d: any) => saveSection('team', d)} saving={saving} authHeader={authHeader} />}
                     {activeTab === 'footer' && <FooterEditor data={content.footer} onSave={(d: any) => saveSection('footer', d)} saving={saving} />}
@@ -1340,6 +1342,68 @@ function ComparisonEditor({ data, onSave, saving }: { data: any; onSave: (d: any
                     <InputField label="Alt Not" value={local.pricingNote?.footnote || ''} onChange={(v: string) => updatePricing('footnote', v)} />
                 </div>
             </EditorCard>
+
+            <SaveButton onClick={() => onSave(local)} saving={saving} />
+        </div>
+    );
+}
+
+// ─── About Editor ───
+const DEFAULT_ABOUT = {
+    heading: { badge: 'Biz Kimiz', title: 'Hakkımızda' },
+    methodology: {
+        title: 'ArslanOps Metodolojisi',
+        subtitle: '90 günlük aşamalı yaklaşım: Teşhisten iyileştirmeye, sürdürülebilir operasyonel mükemmellik',
+    },
+    steps: [
+        { title: 'Teşhis', duration: '1. Hafta', description: 'Stok, satın alma, kasa akışını gözlemler, fire/ikram/sızıntı noktalarını tespit ederim' },
+        { title: 'Düzenleme', duration: '30 Gün', description: "Kontrol listelerini, süreç akışını ve KPI'ları oluşturur, ekip eğitimi veririm" },
+        { title: 'Uygulama', duration: '60 Gün', description: 'Sistemi günlük operasyona entegre eder, ekibin alışmasını sağlarım' },
+        { title: 'İyileştirme', duration: '90 Gün', description: 'Sonuçları ölçer, gerekli ayarlamaları yapar ve sürdürülebilir hale getiririm' },
+    ],
+};
+
+function AboutEditor({ data, onSave, saving }: { data: any; onSave: (d: any) => void; saving: boolean }) {
+    const [local, setLocal] = useState<any>(data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0 ? data : DEFAULT_ABOUT);
+    useEffect(() => { if (data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0) setLocal(data); }, [data]);
+
+    const updateStep = (i: number, key: string, val: string) => {
+        const items = [...(local.steps || [])];
+        items[i] = { ...items[i], [key]: val };
+        setLocal({ ...local, steps: items });
+    };
+
+    return (
+        <div>
+            {/* Bölüm Başlığı */}
+            <EditorCard title="📌 Bölüm Başlığı">
+                <InputField label="Üst Etiket" value={local.heading?.badge || ''} onChange={(v: string) => setLocal({ ...local, heading: { ...(local.heading || {}), badge: v } })} />
+                <InputField label="Ana Başlık" value={local.heading?.title || ''} onChange={(v: string) => setLocal({ ...local, heading: { ...(local.heading || {}), title: v } })} />
+            </EditorCard>
+
+            {/* Metodoloji Başlığı */}
+            <EditorCard title="🔄 Metodoloji Başlığı">
+                <InputField label="Başlık" value={local.methodology?.title || ''} onChange={(v: string) => setLocal({ ...local, methodology: { ...(local.methodology || {}), title: v } })} />
+                <InputField label="Alt Açıklama" value={local.methodology?.subtitle || ''} onChange={(v: string) => setLocal({ ...local, methodology: { ...(local.methodology || {}), subtitle: v } })} multiline />
+            </EditorCard>
+
+            {/* Metodoloji Kartları */}
+            <h3 className="text-lg font-bold text-[#0B1F3B] mb-3">📋 Metodoloji Kartları</h3>
+            {(local.steps || []).map((step: any, i: number) => (
+                <EditorCard key={i} title={`Adım ${i + 1}: ${step.title || 'Yeni'}`}>
+                    <div className="grid grid-cols-2 gap-4">
+                        <InputField label="Başlık" value={step.title} onChange={(v: string) => updateStep(i, 'title', v)} />
+                        <InputField label="Süre" value={step.duration} onChange={(v: string) => updateStep(i, 'duration', v)} />
+                    </div>
+                    <InputField label="Açıklama" value={step.description} onChange={(v: string) => updateStep(i, 'description', v)} multiline />
+                    <button onClick={() => setLocal({ ...local, steps: local.steps.filter((_: any, j: number) => j !== i) })}
+                        className="text-red-400 hover:text-red-600 text-sm flex items-center gap-1"><Trash2 className="w-3 h-3" />Sil</button>
+                </EditorCard>
+            ))}
+            <button onClick={() => setLocal({ ...local, steps: [...(local.steps || []), { title: '', duration: '', description: '' }] })}
+                className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all mb-6">
+                <Plus className="w-4 h-4" />Adım Ekle
+            </button>
 
             <SaveButton onClick={() => onSave(local)} saving={saving} />
         </div>
