@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
@@ -48,6 +48,7 @@ export default function FAQ() {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
     const [faqs, setFaqs] = useState(FALLBACK_FAQ);
     const [isVisible, setIsVisible] = useState(false);
+    const [heading, setHeading] = useState({ badge: 'Sıkça Sorulan Sorular', title: 'Merak Edilenler', subtitle: 'Danışmanlık süreciyle ilgili en çok sorulan sorular ve cevapları' });
     const sectionRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -59,6 +60,11 @@ export default function FAQ() {
                 }
             })
             .catch(() => { });
+
+        fetch(`${API_URL}/api/content/faq_heading`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => { if (data && (data.badge || data.title || data.subtitle)) setHeading(prev => ({ ...prev, ...data })); })
+            .catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -82,13 +88,13 @@ export default function FAQ() {
         <section ref={sectionRef} id="sss" className="section-container bg-white">
             <div className="text-center mb-14">
                 <span className="text-[#C5A55A] font-bold tracking-widest text-sm uppercase mb-2 block">
-                    Sıkça Sorulan Sorular
+                    {heading.badge}
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 section-heading section-heading-gold">
-                    Merak Edilenler
+                    {heading.title}
                 </h2>
                 <p className="text-gray-600 max-w-2xl mx-auto">
-                    Danışmanlık süreciyle ilgili en çok sorulan sorular ve cevapları
+                    {heading.subtitle}
                 </p>
             </div>
 

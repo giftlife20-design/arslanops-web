@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import { Briefcase, TrendingUp, Clock, Award } from 'lucide-react';
@@ -113,6 +113,7 @@ export default function Stats() {
     const [stats, setStats] = useState<StatItem[]>(
         FALLBACK_STATS.map((s, i) => ({ ...s, icon: ICONS[i] || Award }))
     );
+    const [heading, setHeading] = useState({ badge: 'Rakamlarla ArslanOps', title: 'Saha Deneyimi ve Sonuçlar', subtitle: 'Operasyonel mükemmellik için somut göstergeler' });
     const sectionRef = useRef<HTMLDivElement>(null);
 
     // Fetch stats from API
@@ -130,6 +131,9 @@ export default function Stats() {
                         description: s.description || ''
                     }));
                     setStats(apiStats);
+                }
+                if (data?.stats_heading) {
+                    setHeading(prev => ({ ...prev, ...data.stats_heading }));
                 }
             })
             .catch(() => { });
@@ -159,13 +163,13 @@ export default function Stats() {
         >
             <div className="text-center mb-14">
                 <span className="text-[#C5A55A] font-bold tracking-widest text-sm uppercase mb-2 block">
-                    Rakamlarla ArslanOps
+                    {heading.badge}
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 section-heading section-heading-gold">
-                    Saha Deneyimi ve Sonuçlar
+                    {heading.title}
                 </h2>
                 <p className="text-gray-600 max-w-2xl mx-auto">
-                    Operasyonel mükemmellik için somut göstergeler
+                    {heading.subtitle}
                 </p>
             </div>
 

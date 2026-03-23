@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import {
@@ -349,12 +349,12 @@ export default function AdminPage() {
                     )}
                     {activeTab === 'branding' && <BrandingEditor data={content.branding} onSave={(d: any) => saveSection('branding', d)} saving={saving} authHeader={authHeader} />}
                     {activeTab === 'hero' && <HeroEditor data={content.hero} onSave={(d: any) => saveSection('hero', d)} saving={saving} authHeader={authHeader} />}
-                    {activeTab === 'stats' && <StatsEditor data={content.stats} onSave={(d: any) => saveSection('stats', d)} saving={saving} />}
-                    {activeTab === 'services' && <ServicesEditor data={content.services} onSave={(d: any) => saveSection('services', d)} saving={saving} />}
-                    {activeTab === 'testimonials' && <TestimonialsEditor data={content.testimonials} onSave={(d: any) => saveSection('testimonials', d)} saving={saving} authHeader={authHeader} sectionVisible={content.testimonials_visible !== false} onToggleVisibility={(v: boolean) => saveSection('testimonials_visible', v)} />}
+                    {activeTab === 'stats' && <StatsEditor data={content.stats} onSave={(d: any) => saveSection('stats', d)} saving={saving} heading={content.stats_heading || {}} onSaveHeading={(d: any) => saveSection('stats_heading', d)} />}
+                    {activeTab === 'services' && <ServicesEditor data={content.services} onSave={(d: any) => saveSection('services', d)} saving={saving} heading={content.services_heading || {}} onSaveHeading={(d: any) => saveSection('services_heading', d)} />}
+                    {activeTab === 'testimonials' && <TestimonialsEditor data={content.testimonials} onSave={(d: any) => saveSection('testimonials', d)} saving={saving} authHeader={authHeader} sectionVisible={content.testimonials_visible !== false} onToggleVisibility={(v: boolean) => saveSection('testimonials_visible', v)} heading={content.testimonials_heading || {}} onSaveHeading={(d: any) => saveSection('testimonials_heading', d)} />}
                     {activeTab === 'logo_clients' && <LogoClientsEditor data={content.logo_clients} onSave={(d: any) => saveSection('logo_clients', d)} saving={saving} authHeader={authHeader} sectionVisible={content.logo_clients_visible !== false} onToggleVisibility={(v: boolean) => saveSection('logo_clients_visible', v)} />}
-                    {activeTab === 'packages' && <PackagesEditor data={content.packages} onSave={(d: any) => saveSection('packages', d)} saving={saving} />}
-                    {activeTab === 'faq' && <FAQEditor data={content.faq} onSave={(d: any) => saveSection('faq', d)} saving={saving} />}
+                    {activeTab === 'packages' && <PackagesEditor data={content.packages} onSave={(d: any) => saveSection('packages', d)} saving={saving} heading={content.packages_heading || {}} onSaveHeading={(d: any) => saveSection('packages_heading', d)} />}
+                    {activeTab === 'faq' && <FAQEditor data={content.faq} onSave={(d: any) => saveSection('faq', d)} saving={saving} heading={content.faq_heading || {}} onSaveHeading={(d: any) => saveSection('faq_heading', d)} />}
                     {activeTab === 'team' && <TeamEditor data={content.team} onSave={(d: any) => saveSection('team', d)} saving={saving} authHeader={authHeader} />}
                     {activeTab === 'footer' && <FooterEditor data={content.footer} onSave={(d: any) => saveSection('footer', d)} saving={saving} />}
                     {activeTab === 'durum_ozeti' && <DurumOzetiForm />}
@@ -495,6 +495,46 @@ function LeadsTab({ leads, searchTerm, setSearchTerm, onRefresh, onExport, onDel
 // ═══════════════════════════════════════════
 
 // Shared UI Components
+
+// ─── Section Heading Editor (Reusable) ───
+function SectionHeadingEditor({ heading, onChange, defaults }: {
+    heading: { badge?: string; title?: string; subtitle?: string };
+    onChange: (h: { badge?: string; title?: string; subtitle?: string }) => void;
+    defaults: { badge: string; title: string; subtitle: string };
+}) {
+    return (
+        <div className="bg-white rounded-xl border border-blue-100 shadow-sm p-6 mb-6">
+            <h3 className="font-bold text-[#0B1F3B] mb-1 text-lg flex items-center gap-2">
+                <Settings className="w-4 h-4 text-blue-500" /> Bölüm Başlığı Ayarları
+            </h3>
+            <p className="text-xs text-gray-400 mb-4">Bu bölümün sitedeki ana başlıklarını buradan değiştirebilirsiniz.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Üst Etiket</label>
+                    <input type="text" value={heading.badge ?? defaults.badge}
+                        onChange={e => onChange({ ...heading, badge: e.target.value })}
+                        placeholder={defaults.badge}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#C4803D] focus:ring-2 focus:ring-[#C4803D]/10 transition-all" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Ana Başlık</label>
+                    <input type="text" value={heading.title ?? defaults.title}
+                        onChange={e => onChange({ ...heading, title: e.target.value })}
+                        placeholder={defaults.title}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#C4803D] focus:ring-2 focus:ring-[#C4803D]/10 transition-all" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Alt Açıklama</label>
+                    <input type="text" value={heading.subtitle ?? defaults.subtitle}
+                        onChange={e => onChange({ ...heading, subtitle: e.target.value })}
+                        placeholder={defaults.subtitle}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#C4803D] focus:ring-2 focus:ring-[#C4803D]/10 transition-all" />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function EditorCard({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
@@ -828,9 +868,11 @@ function HeroEditor({ data, onSave, saving, authHeader }: { data: any; onSave: (
 }
 
 // ─── Stats Editor ───
-function StatsEditor({ data, onSave, saving }: { data: any; onSave: (d: any) => void; saving: boolean }) {
+function StatsEditor({ data, onSave, saving, heading, onSaveHeading }: { data: any; onSave: (d: any) => void; saving: boolean; heading: any; onSaveHeading: (d: any) => void }) {
     const [local, setLocal] = useState<any[]>(data || []);
+    const [localHeading, setLocalHeading] = useState(heading || {});
     useEffect(() => { if (data) setLocal(data); }, [data]);
+    useEffect(() => { if (heading) setLocalHeading(heading); }, [heading]);
 
     const update = (i: number, key: string, value: any) => {
         const items = [...local];
@@ -840,6 +882,8 @@ function StatsEditor({ data, onSave, saving }: { data: any; onSave: (d: any) => 
 
     return (
         <div>
+            <SectionHeadingEditor heading={localHeading} onChange={setLocalHeading}
+                defaults={{ badge: 'Rakamlarla ArslanOps', title: 'Saha Deneyimi ve Sonuçlar', subtitle: 'Operasyonel mükemmellik için somut göstergeler' }} />
             {local.map((item: any, i: number) => (
                 <EditorCard key={i} title={`İstatistik ${i + 1}`}>
                     <div className="grid grid-cols-3 gap-4">
@@ -858,16 +902,18 @@ function StatsEditor({ data, onSave, saving }: { data: any; onSave: (d: any) => 
                     className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all">
                     <Plus className="w-4 h-4" />Yeni İstatistik
                 </button>
-                <SaveButton onClick={() => onSave(local)} saving={saving} />
+                <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
             </div>
         </div>
     );
 }
 
 // ─── Services Editor ───
-function ServicesEditor({ data, onSave, saving }: { data: any; onSave: (d: any) => void; saving: boolean }) {
+function ServicesEditor({ data, onSave, saving, heading, onSaveHeading }: { data: any; onSave: (d: any) => void; saving: boolean; heading: any; onSaveHeading: (d: any) => void }) {
     const [local, setLocal] = useState<any[]>(data || []);
+    const [localHeading, setLocalHeading] = useState(heading || {});
     useEffect(() => { if (data) setLocal(data); }, [data]);
+    useEffect(() => { if (heading) setLocalHeading(heading); }, [heading]);
 
     const update = (i: number, key: string, value: any) => {
         const items = [...local];
@@ -885,6 +931,8 @@ function ServicesEditor({ data, onSave, saving }: { data: any; onSave: (d: any) 
 
     return (
         <div>
+            <SectionHeadingEditor heading={localHeading} onChange={setLocalHeading}
+                defaults={{ badge: 'Hizmetlerimiz', title: 'Neler Yapıyoruz?', subtitle: 'İşletmenizi her açıdan analiz ediyor, sonuç odaklı çözümler sunuyoruz.' }} />
             {local.map((item: any, i: number) => (
                 <EditorCard key={i} title={`Hizmet ${i + 1}: ${item.title || 'Yeni'}`}>
                     <InputField label="Başlık" value={item.title} onChange={(v: string) => update(i, 'title', v)} />
@@ -911,16 +959,18 @@ function ServicesEditor({ data, onSave, saving }: { data: any; onSave: (d: any) 
                     className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all">
                     <Plus className="w-4 h-4" />Yeni Hizmet
                 </button>
-                <SaveButton onClick={() => onSave(local)} saving={saving} />
+                <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
             </div>
         </div>
     );
 }
 
 // ─── Testimonials Editor ───
-function TestimonialsEditor({ data, onSave, saving, authHeader, sectionVisible, onToggleVisibility }: { data: any; onSave: (d: any) => void; saving: boolean; authHeader: string; sectionVisible: boolean; onToggleVisibility: (v: boolean) => void }) {
+function TestimonialsEditor({ data, onSave, saving, authHeader, sectionVisible, onToggleVisibility, heading, onSaveHeading }: { data: any; onSave: (d: any) => void; saving: boolean; authHeader: string; sectionVisible: boolean; onToggleVisibility: (v: boolean) => void; heading: any; onSaveHeading: (d: any) => void }) {
     const [local, setLocal] = useState<any[]>(data || []);
+    const [localHeading, setLocalHeading] = useState(heading || {});
     useEffect(() => { if (data) setLocal(data); }, [data]);
+    useEffect(() => { if (heading) setLocalHeading(heading); }, [heading]);
 
     const update = (i: number, key: string, value: any) => {
         const items = [...local];
@@ -930,6 +980,8 @@ function TestimonialsEditor({ data, onSave, saving, authHeader, sectionVisible, 
 
     return (
         <div>
+            <SectionHeadingEditor heading={localHeading} onChange={setLocalHeading}
+                defaults={{ badge: 'Müşteri Yorumları', title: 'Müşterilerimiz Ne Diyor?', subtitle: 'Birlikte çalıştığımız işletmelerin deneyimleri' }} />
             {/* Visibility Toggle */}
             <EditorCard title="Bölüm Görünürlüğü">
                 <div className="flex items-center justify-between">
@@ -1032,16 +1084,18 @@ function TestimonialsEditor({ data, onSave, saving, authHeader, sectionVisible, 
                     className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all">
                     <Plus className="w-4 h-4" />Yeni Yorum
                 </button>
-                <SaveButton onClick={() => onSave(local)} saving={saving} />
+                <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
             </div>
         </div>
     );
 }
 
 // ─── Packages Editor ───
-function PackagesEditor({ data, onSave, saving }: { data: any; onSave: (d: any) => void; saving: boolean }) {
+function PackagesEditor({ data, onSave, saving, heading, onSaveHeading }: { data: any; onSave: (d: any) => void; saving: boolean; heading: any; onSaveHeading: (d: any) => void }) {
     const [local, setLocal] = useState<any[]>(data || []);
+    const [localHeading, setLocalHeading] = useState(heading || {});
     useEffect(() => { if (data) setLocal(data); }, [data]);
+    useEffect(() => { if (heading) setLocalHeading(heading); }, [heading]);
 
     const update = (i: number, key: string, value: any) => {
         const items = [...local];
@@ -1059,8 +1113,25 @@ function PackagesEditor({ data, onSave, saving }: { data: any; onSave: (d: any) 
 
     return (
         <div>
+            <SectionHeadingEditor heading={localHeading} onChange={setLocalHeading}
+                defaults={{ badge: 'Danışmanlık Paketleri', title: 'Paketler', subtitle: 'İhtiyacınıza göre ölçeklenebilir danışmanlık seçenekleri.' }} />
             {local.map((item: any, i: number) => (
                 <EditorCard key={i} title={`Paket: ${item.name || 'Yeni'}`}>
+                    {/* Görünürlük Toggle */}
+                    <div className="flex items-center justify-between mb-5 p-3 rounded-lg bg-gray-50 border border-gray-100">
+                        <div className="flex items-center gap-3">
+                            <Eye className="w-4 h-4 text-gray-500" />
+                            <div>
+                                <span className="text-sm font-medium text-gray-700">Bu paketi sitede göster</span>
+                                <p className="text-xs text-gray-400">Kapatırsanız bu paket ziyaretçilere görünmez</p>
+                            </div>
+                        </div>
+                        <button onClick={() => update(i, 'visible', item.visible === false ? true : false)}
+                            className={`relative w-12 h-6 rounded-full transition-all duration-300 ${item.visible !== false ? 'bg-emerald-500' : 'bg-gray-300'}`}>
+                            <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-all duration-300 ${item.visible !== false ? 'left-6' : 'left-0.5'}`} />
+                        </button>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                         <InputField label="Paket Adı" value={item.name} onChange={(v: string) => update(i, 'name', v)} />
                         <div className="mb-4">
@@ -1075,6 +1146,43 @@ function PackagesEditor({ data, onSave, saving }: { data: any; onSave: (d: any) 
                         </div>
                     </div>
                     <InputField label="Açıklama" value={item.description} onChange={(v: string) => update(i, 'description', v)} />
+
+                    {/* Fiyat Bölümü */}
+                    <div className="mb-5 p-4 rounded-xl border border-amber-200 bg-amber-50/50">
+                        <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                            <CreditCard className="w-4 h-4 text-amber-600" /> Fiyat Ayarları
+                        </h4>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="mb-0">
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Başlangıç Fiyatı (₺)</label>
+                                <input type="text" value={item.startingPrice || ''} onChange={e => update(i, 'startingPrice', e.target.value)}
+                                    placeholder="Örn: 20.000"
+                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#C4803D] focus:ring-2 focus:ring-[#C4803D]/10 transition-all" />
+                            </div>
+                            <div className="mb-0">
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Fiyatı Sitede Göster</label>
+                                <button onClick={() => update(i, 'showPrice', item.showPrice === false ? true : false)}
+                                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-medium transition-all ${item.showPrice !== false
+                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                        : 'bg-gray-50 text-gray-500 border-gray-200 hover:border-amber-300'
+                                        }`}>
+                                    {item.showPrice !== false ? (
+                                        <><Eye className="w-4 h-4" /> Fiyat Görünür</>
+                                    ) : (
+                                        <><X className="w-4 h-4" /> Fiyat Gizli</>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                        {item.showPrice !== false && item.startingPrice && (
+                            <div className="mt-3 p-3 rounded-lg bg-white border border-gray-100">
+                                <span className="text-xs text-gray-400">Önizleme: </span>
+                                <span className="text-lg font-bold text-[#0B1F3B]">₺{item.startingPrice}</span>
+                                <span className="text-sm text-gray-400 ml-1">'den başlayan</span>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">Özellikler</label>
                         {(item.features || []).map((f: string, fi: number) => (
@@ -1094,20 +1202,22 @@ function PackagesEditor({ data, onSave, saving }: { data: any; onSave: (d: any) 
                 </EditorCard>
             ))}
             <div className="flex items-center gap-4">
-                <button onClick={() => setLocal([...local, { name: '', description: '', features: [], recommended: false }])}
+                <button onClick={() => setLocal([...local, { name: '', description: '', features: [], recommended: false, startingPrice: '', showPrice: true, visible: true }])}
                     className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all">
                     <Plus className="w-4 h-4" />Yeni Paket
                 </button>
-                <SaveButton onClick={() => onSave(local)} saving={saving} />
+                <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
             </div>
         </div>
     );
 }
 
 // ─── FAQ Editor ───
-function FAQEditor({ data, onSave, saving }: { data: any; onSave: (d: any) => void; saving: boolean }) {
+function FAQEditor({ data, onSave, saving, heading, onSaveHeading }: { data: any; onSave: (d: any) => void; saving: boolean; heading: any; onSaveHeading: (d: any) => void }) {
     const [local, setLocal] = useState<any[]>(data || []);
+    const [localHeading, setLocalHeading] = useState(heading || {});
     useEffect(() => { if (data) setLocal(data); }, [data]);
+    useEffect(() => { if (heading) setLocalHeading(heading); }, [heading]);
 
     const update = (i: number, key: string, value: string) => {
         const items = [...local];
@@ -1117,6 +1227,8 @@ function FAQEditor({ data, onSave, saving }: { data: any; onSave: (d: any) => vo
 
     return (
         <div>
+            <SectionHeadingEditor heading={localHeading} onChange={setLocalHeading}
+                defaults={{ badge: 'Sıkça Sorulan Sorular', title: 'SSS', subtitle: 'Danışmanlık sürecimizle ilgili merak ettikleriniz' }} />
             {local.map((item: any, i: number) => (
                 <EditorCard key={i} title={`Soru ${i + 1}`}>
                     <InputField label="Soru" value={item.question} onChange={(v: string) => update(i, 'question', v)} />
@@ -1130,7 +1242,7 @@ function FAQEditor({ data, onSave, saving }: { data: any; onSave: (d: any) => vo
                     className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all">
                     <Plus className="w-4 h-4" />Yeni Soru
                 </button>
-                <SaveButton onClick={() => onSave(local)} saving={saving} />
+                <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
             </div>
         </div>
     );

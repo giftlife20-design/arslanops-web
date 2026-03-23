@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -52,7 +52,15 @@ const SERVICES = [
 
 export default function Services() {
     const [isVisible, setIsVisible] = useState(false);
+    const [heading, setHeading] = useState({ badge: 'Hizmetlerimiz', title: 'İşletmenize Özel Çözümler', subtitle: 'Coffee ve restoran sektöründe operasyonel mükemmellik için kapsamlı danışmanlık hizmetleri' });
     const sectionRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/content/services_heading`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => { if (data && (data.badge || data.title || data.subtitle)) setHeading(prev => ({ ...prev, ...data })); })
+            .catch(() => {});
+    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -84,13 +92,13 @@ export default function Services() {
             <div className="relative z-10">
                 <div className="text-center mb-14">
                     <span className="text-[#C5A55A] font-bold tracking-widest text-sm uppercase mb-2 block">
-                        Hizmetlerimiz
+                        {heading.badge}
                     </span>
                     <h2 className="text-3xl md:text-4xl font-bold mb-6 section-heading section-heading-gold text-white">
-                        İşletmenize Özel Çözümler
+                        {heading.title}
                     </h2>
                     <p className="text-gray-300 max-w-2xl mx-auto">
-                        Coffee ve restoran sektöründe operasyonel mükemmellik için kapsamlı danışmanlık hizmetleri
+                        {heading.subtitle}
                     </p>
                 </div>
 
