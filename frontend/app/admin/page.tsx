@@ -37,7 +37,7 @@ interface Lead {
     olusturma_tarihi: string;
 }
 
-type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'problems' | 'whyus' | 'services' | 'deliverables' | 'testimonials' | 'logo_clients' | 'packages' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri' | 'sozlesme_sablonu';
+type TabId = 'dashboard' | 'leads' | 'branding' | 'hero' | 'stats' | 'problems' | 'whyus' | 'services' | 'deliverables' | 'portfolio' | 'testimonials' | 'logo_clients' | 'packages' | 'faq' | 'team' | 'footer' | 'egitim_seti' | 'durum_ozeti' | 'aksiyon_plani' | 'kontrol_listesi' | 'aylik_performans' | 'teklif_sablonu' | 'ziyaret_notu' | 'kartvizit' | 'yayin_bilgileri' | 'sozlesme_sablonu';
 
 interface TabDef {
     id: TabId;
@@ -56,6 +56,7 @@ const TABS: TabDef[] = [
     { id: 'whyus', label: 'Neden Biz?', icon: Star, group: 'İçerik Yönetimi' },
     { id: 'services', label: 'Hizmetler', icon: Briefcase, group: 'İçerik Yönetimi' },
     { id: 'deliverables', label: 'Teslim Edilenler', icon: FileText, group: 'İçerik Yönetimi' },
+    { id: 'portfolio', label: 'Senaryolar', icon: Briefcase, group: 'İçerik Yönetimi' },
     { id: 'testimonials', label: 'Müşteri Yorumları', icon: Quote, group: 'İçerik Yönetimi' },
     { id: 'logo_clients', label: 'Referans Logolar', icon: Image, group: 'İçerik Yönetimi' },
     { id: 'packages', label: 'Paketler', icon: Package, group: 'İçerik Yönetimi' },
@@ -357,6 +358,7 @@ export default function AdminPage() {
                     {activeTab === 'whyus' && <WhyUsEditor data={content.whyus} onSave={(d: any) => saveSection('whyus', d)} saving={saving} heading={content.whyus_heading || {}} onSaveHeading={(d: any) => saveSection('whyus_heading', d)} />}
                     {activeTab === 'services' && <ServicesEditor data={content.services} onSave={(d: any) => saveSection('services', d)} saving={saving} heading={content.services_heading || {}} onSaveHeading={(d: any) => saveSection('services_heading', d)} />}
                     {activeTab === 'deliverables' && <DeliverablesEditor data={content.deliverables} onSave={(d: any) => saveSection('deliverables', d)} saving={saving} heading={content.deliverables_heading || {}} onSaveHeading={(d: any) => saveSection('deliverables_heading', d)} />}
+                    {activeTab === 'portfolio' && <PortfolioEditor data={content.portfolio} onSave={(d: any) => saveSection('portfolio', d)} saving={saving} heading={content.portfolio_heading || {}} onSaveHeading={(d: any) => saveSection('portfolio_heading', d)} authHeader={authHeader} />}
                     {activeTab === 'testimonials' && <TestimonialsEditor data={content.testimonials} onSave={(d: any) => saveSection('testimonials', d)} saving={saving} authHeader={authHeader} sectionVisible={content.testimonials_visible !== false} onToggleVisibility={(v: boolean) => saveSection('testimonials_visible', v)} heading={content.testimonials_heading || {}} onSaveHeading={(d: any) => saveSection('testimonials_heading', d)} />}
                     {activeTab === 'logo_clients' && <LogoClientsEditor data={content.logo_clients} onSave={(d: any) => saveSection('logo_clients', d)} saving={saving} authHeader={authHeader} sectionVisible={content.logo_clients_visible !== false} onToggleVisibility={(v: boolean) => saveSection('logo_clients_visible', v)} />}
                     {activeTab === 'packages' && <PackagesEditor data={content.packages} onSave={(d: any) => saveSection('packages', d)} saving={saving} heading={content.packages_heading || {}} onSaveHeading={(d: any) => saveSection('packages_heading', d)} />}
@@ -1390,6 +1392,63 @@ function DeliverablesEditor({ data, onSave, saving, heading, onSaveHeading }: { 
                 <button onClick={() => setLocal([...local, { title: '', description: '', format: '' }])}
                     className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all">
                     <Plus className="w-4 h-4" />Yeni Teslimat
+                </button>
+                <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
+            </div>
+        </div>
+    );
+}
+
+// ─── Portfolio Editor ───
+const DEFAULT_PORTFOLIO = [
+    { title: 'Coffee Shop — Maliyet Kontrolü', type: 'Maliyet Analizi', challenge: 'COGS oranı %40 üstünde, fire ve ikram kayıpları kontrol dışında, kârlılık düşük', solution: 'Stok sayım sistemi kurulur, fire takip formu oluşturulur, satın alma süreci optimize edilir', result: 'Hedef: 90 günde COGS %25-30 bandına çekmek, aylık binlerce TL tasarruf', duration: '90 gün', image: '/portfolio/01.png' },
+    { title: 'Yeni Açılış — Sıfırdan Sistem', type: 'Açılış Danışmanlığı', challenge: 'Sıfırdan kafe/restoran açılışında konsept, ekipman listesi ve operasyon planı yok', solution: 'Konsept belirleme, ekipman listesi, menü mühendisliği ve açılış checklistleri hazırlanır', result: 'Hedef: İlk günden profesyonel işleyiş, 6 ayda başa baş noktasına ulaşma', duration: '60 gün', image: '/portfolio/02.png' },
+    { title: 'Çok Şubeli — Standardizasyon', type: 'Operasyon Düzeni', challenge: 'Farklı şubelerde farklı standartlar, tutarsız kalite ve kontrol eksikliği', solution: 'SOP dokümanları, kontrol listeleri ve KPI dashboard sistemi kurulur', result: 'Hedef: Tüm şubelerde aynı kalite standardı, ekip verimliliğinde %30+ artış', duration: '120 gün', image: '/portfolio/03.png' },
+];
+
+function PortfolioEditor({ data, onSave, saving, heading, onSaveHeading, authHeader }: { data: any; onSave: (d: any) => void; saving: boolean; heading: any; onSaveHeading: (d: any) => void; authHeader: string }) {
+    const [local, setLocal] = useState<any[]>(data && Array.isArray(data) && data.length > 0 ? data : DEFAULT_PORTFOLIO);
+    const [localHeading, setLocalHeading] = useState(heading || {});
+    useEffect(() => { if (data && Array.isArray(data) && data.length > 0) setLocal(data); }, [data]);
+    useEffect(() => { if (heading) setLocalHeading(heading); }, [heading]);
+
+    const update = (i: number, key: string, value: string) => {
+        const items = [...local];
+        items[i] = { ...items[i], [key]: value };
+        setLocal(items);
+    };
+
+    return (
+        <div>
+            <SectionHeadingEditor heading={localHeading} onChange={setLocalHeading}
+                defaults={{ badge: 'Nasıl Çalışıyoruz', title: 'Örnek Senaryolar', subtitle: '25+ yıllık saha deneyimine dayanan tipik problem-çözüm yaklaşımlarımız' }} />
+            {local.map((item: any, i: number) => (
+                <EditorCard key={i} title={`Senaryo ${i + 1}: ${item.title || 'Yeni'}`}>
+                    <div className="grid grid-cols-2 gap-4">
+                        <InputField label="Başlık" value={item.title} onChange={(v: string) => update(i, 'title', v)} />
+                        <InputField label="Tür Etiketi" value={item.type} onChange={(v: string) => update(i, 'type', v)} />
+                    </div>
+                    <InputField label="Problem" value={item.challenge} onChange={(v: string) => update(i, 'challenge', v)} multiline />
+                    <InputField label="Çözüm" value={item.solution} onChange={(v: string) => update(i, 'solution', v)} multiline />
+                    <InputField label="Sonuç" value={item.result} onChange={(v: string) => update(i, 'result', v)} multiline />
+                    <InputField label="Süre" value={item.duration} onChange={(v: string) => update(i, 'duration', v)} />
+                    <FileUploader
+                        label="Senaryo Görseli"
+                        accept="image/*"
+                        currentUrl={item.image || ''}
+                        onUpload={(url) => update(i, 'image', url)}
+                        onRemove={() => update(i, 'image', '')}
+                        category="portfolio"
+                        authHeader={authHeader}
+                    />
+                    <button onClick={() => setLocal(local.filter((_: any, j: number) => j !== i))}
+                        className="text-red-400 hover:text-red-600 text-sm flex items-center gap-1 mt-2"><Trash2 className="w-3 h-3" />Senaryoyu Sil</button>
+                </EditorCard>
+            ))}
+            <div className="flex items-center gap-4">
+                <button onClick={() => setLocal([...local, { title: '', type: '', challenge: '', solution: '', result: '', duration: '', image: '' }])}
+                    className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-[#C4803D] hover:text-[#C4803D] transition-all">
+                    <Plus className="w-4 h-4" />Yeni Senaryo
                 </button>
                 <SaveButton onClick={() => { onSave(local); onSaveHeading(localHeading); }} saving={saving} />
             </div>

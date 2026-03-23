@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
@@ -36,7 +36,29 @@ const PORTFOLIO = [
 
 export default function Portfolio() {
     const [isVisible, setIsVisible] = useState(false);
+    const [heading, setHeading] = useState({ badge: 'Nasıl Çalışıyoruz', title: 'Örnek Senaryolar', subtitle: '25+ yıllık saha deneyimine dayanan tipik problem-çözüm yaklaşımlarımız' });
+    const [portfolio, setPortfolio] = useState(PORTFOLIO);
     const sectionRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        fetch(`${API_URL}/api/content/portfolio_heading`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => { if (data && (data.badge || data.title || data.subtitle)) setHeading(prev => ({ ...prev, ...data })); })
+            .catch(() => {});
+        fetch(`${API_URL}/api/content/portfolio`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data && Array.isArray(data) && data.length > 0) {
+                    const merged = data.map((item: any, i: number) => ({
+                        ...PORTFOLIO[i],
+                        ...item,
+                    }));
+                    setPortfolio(merged);
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -63,18 +85,18 @@ export default function Portfolio() {
         <section ref={sectionRef} id="portfolyo" className="section-container bg-white">
             <div className="text-center mb-14">
                 <span className="text-[#C5A55A] font-bold tracking-widest text-sm uppercase mb-2 block">
-                    Nasıl Çalışıyoruz
+                    {heading.badge}
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 section-heading section-heading-gold">
-                    Örnek Senaryolar
+                    {heading.title}
                 </h2>
                 <p className="text-gray-600 max-w-2xl mx-auto">
-                    25+ yıllık saha deneyimine dayanan tipik problem-çözüm yaklaşımlarımız
+                    {heading.subtitle}
                 </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
-                {PORTFOLIO.map((project, index) => (
+                {portfolio.map((project, index) => (
                     <div
                         key={index}
                         className={`card group transition-all duration-700 overflow-hidden p-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
