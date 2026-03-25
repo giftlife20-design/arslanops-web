@@ -1,7 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import { useBranding } from './BrandingProvider';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -19,14 +20,9 @@ export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('');
-    const [branding, setBranding] = useState<{ logo_url?: string; logo_text?: string }>({});
+    const { branding, loaded: brandingLoaded } = useBranding();
 
     useEffect(() => {
-        // Fetch branding
-        fetch(`${API_URL}/api/content/branding`)
-            .then(r => r.ok ? r.json() : null)
-            .then(data => { if (data) setBranding(data); })
-            .catch(() => { });
 
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 40);
@@ -94,10 +90,12 @@ export default function Navbar() {
                     >
                         {branding.logo_url ? (
                             <img src={`${API_URL}${branding.logo_url}`} alt={branding.logo_text || 'Logo'} className="h-9 w-auto group-hover:scale-105 transition-transform" />
-                        ) : (
+                        ) : brandingLoaded ? (
                             <div className="w-10 h-10 bg-gradient-to-br from-[#C5A55A] to-[#A8863D] rounded-lg flex items-center justify-center font-bold text-white text-lg group-hover:scale-105 transition-all shadow-lg shadow-[#C5A55A]/20">
                                 A
                             </div>
+                        ) : (
+                            <div className="w-10 h-10" />
                         )}
                         <div className="flex flex-col">
                             <span className="text-white font-bold text-lg leading-tight tracking-tight">

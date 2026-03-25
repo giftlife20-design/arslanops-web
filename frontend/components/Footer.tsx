@@ -1,7 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Mail, MessageCircle, Instagram, Linkedin, MapPin, ArrowUp } from 'lucide-react';
+import { useBranding } from './BrandingProvider';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -25,6 +26,7 @@ export default function Footer() {
         location: 'Türkiye genelinde hizmet',
         address: ''
     });
+    const { branding, loaded: brandingLoaded } = useBranding();
 
     useEffect(() => {
         fetch(`${API_URL}/api/content/footer`)
@@ -90,11 +92,17 @@ export default function Footer() {
                         {/* Marka */}
                         <div className="md:col-span-1">
                             <div className="flex items-center gap-2.5 mb-4">
-                                <div className="w-10 h-10 bg-gradient-to-br from-[#C5A55A] to-[#A8863D] rounded-lg flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-[#C5A55A]/20">
-                                    A
-                                </div>
+                                {branding.logo_url ? (
+                                    <img src={`${API_URL}${branding.logo_url}`} alt={branding.logo_text || 'Logo'} className="h-9 w-auto" />
+                                ) : brandingLoaded ? (
+                                    <div className="w-10 h-10 bg-gradient-to-br from-[#C5A55A] to-[#A8863D] rounded-lg flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-[#C5A55A]/20">
+                                        A
+                                    </div>
+                                ) : (
+                                    <div className="w-10 h-10" />
+                                )}
                                 <div>
-                                    <div className="font-bold text-lg leading-tight">ArslanOps</div>
+                                    <div className="font-bold text-lg leading-tight">{branding.logo_text || 'ArslanOps'}</div>
                                     <div className="text-[10px] text-[#C5A55A]/60 tracking-wider uppercase">Coffee &amp; Restoran Operasyon</div>
                                 </div>
                             </div>
