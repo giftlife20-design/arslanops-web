@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Inter, Playfair_Display } from "next/font/google";
-import ClientProviders from "@/components/ClientProviders";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -75,9 +74,7 @@ export default function RootLayout({
           </>
         )}
       </head>
-      <body className={`${inter.variable} ${playfair.variable} ${inter.className}`}>
-        <ClientProviders>{children}</ClientProviders>
-      </body>
+      <body className={`${inter.variable} ${playfair.variable} ${inter.className}`}>{children}</body>
     </html>
   );
 }

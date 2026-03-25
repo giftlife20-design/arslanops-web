@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Mail, MessageCircle, Instagram, Linkedin, MapPin, ArrowUp } from 'lucide-react';
-import { useBranding } from './BrandingProvider';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -26,13 +25,22 @@ export default function Footer() {
         location: 'Türkiye genelinde hizmet',
         address: ''
     });
-    const { branding, loaded: brandingLoaded } = useBranding();
+    const [branding, setBranding] = useState<{ logo_url?: string; logo_text?: string }>({});
+    const [brandingLoaded, setBrandingLoaded] = useState(false);
 
     useEffect(() => {
         fetch(`${API_URL}/api/content/footer`)
             .then(r => r.ok ? r.json() : null)
             .then(data => { if (data) setFooter(prev => ({ ...prev, ...data })); })
             .catch(() => { });
+
+        fetch(`${API_URL}/api/content/branding`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data) setBranding(data);
+                setBrandingLoaded(true);
+            })
+            .catch(() => { setBrandingLoaded(true); });
     }, []);
 
     // Auto-fix URLs missing protocol

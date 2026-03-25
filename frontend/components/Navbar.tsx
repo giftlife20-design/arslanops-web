@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
-import { useBranding } from './BrandingProvider';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -20,9 +19,17 @@ export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('');
-    const { branding, loaded: brandingLoaded } = useBranding();
+    const [branding, setBranding] = useState<{ logo_url?: string; logo_text?: string }>({});
+    const [brandingLoaded, setBrandingLoaded] = useState(false);
 
     useEffect(() => {
+        fetch(`${API_URL}/api/content/branding`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data) setBranding(data);
+                setBrandingLoaded(true);
+            })
+            .catch(() => { setBrandingLoaded(true); });
 
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 40);
