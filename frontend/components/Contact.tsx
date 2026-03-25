@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { Send, CheckCircle, Mail, MessageCircle, MapPin, Clock } from 'lucide-react';
@@ -16,11 +16,12 @@ interface FooterData {
 
 export default function Contact() {
     const [formData, setFormData] = useState({
-        name: '',
+        ad_soyad: '',
         email: '',
-        phone: '',
-        business_type: '',
-        message: ''
+        telefon: '',
+        isletme_turu: '',
+        sehir: '',
+        mesaj: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -76,7 +77,7 @@ export default function Contact() {
 
             if (res.ok) {
                 setIsSubmitted(true);
-                setFormData({ name: '', email: '', phone: '', business_type: '', message: '' });
+                setFormData({ ad_soyad: '', email: '', telefon: '', isletme_turu: '', sehir: '', mesaj: '' });
             } else {
                 const data = await res.json();
                 setError(data.detail || 'Bir hata oluştu. Lütfen tekrar deneyin.');
@@ -141,19 +142,18 @@ export default function Contact() {
                                         id="form-ad-soyad"
                                         type="text"
                                         required
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        value={formData.ad_soyad}
+                                        onChange={(e) => setFormData({ ...formData, ad_soyad: e.target.value })}
                                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#C5A55A]/50 focus:ring-1 focus:ring-[#C5A55A]/20 transition-all"
                                         placeholder="Adınız Soyadınız"
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                                        E-posta *
+                                        E-posta
                                     </label>
                                     <input
                                         type="email"
-                                        required
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#C5A55A]/50 focus:ring-1 focus:ring-[#C5A55A]/20 transition-all"
@@ -165,23 +165,41 @@ export default function Contact() {
                             <div className="grid sm:grid-cols-2 gap-5">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                                        Telefon
+                                        Telefon *
                                     </label>
                                     <input
                                         type="tel"
-                                        value={formData.phone}
-                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        required
+                                        value={formData.telefon}
+                                        onChange={(e) => setFormData({ ...formData, telefon: e.target.value })}
                                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#C5A55A]/50 focus:ring-1 focus:ring-[#C5A55A]/20 transition-all"
                                         placeholder={footer.phone_display}
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                                        İşletme Türü
+                                        Şehir *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={formData.sehir}
+                                        onChange={(e) => setFormData({ ...formData, sehir: e.target.value })}
+                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#C5A55A]/50 focus:ring-1 focus:ring-[#C5A55A]/20 transition-all"
+                                        placeholder="İstanbul"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                                        İşletme Türü *
                                     </label>
                                     <select
-                                        value={formData.business_type}
-                                        onChange={(e) => setFormData({ ...formData, business_type: e.target.value })}
+                                        required
+                                        value={formData.isletme_turu}
+                                        onChange={(e) => setFormData({ ...formData, isletme_turu: e.target.value })}
                                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#C5A55A]/50 focus:ring-1 focus:ring-[#C5A55A]/20 transition-all"
                                     >
                                         <option value="" className="text-black">Seçiniz</option>
@@ -194,19 +212,19 @@ export default function Contact() {
                                         <option value="diger" className="text-black">Diğer</option>
                                     </select>
                                 </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                                    Mesajınız
-                                </label>
-                                <textarea
-                                    rows={4}
-                                    value={formData.message}
-                                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#C5A55A]/50 focus:ring-1 focus:ring-[#C5A55A]/20 transition-all resize-none"
-                                    placeholder="İşletmenizle ilgili kısa bir bilgi verin..."
-                                />
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                                        Mesajınız *
+                                    </label>
+                                    <textarea
+                                        rows={3}
+                                        required
+                                        value={formData.mesaj}
+                                        onChange={(e) => setFormData({ ...formData, mesaj: e.target.value })}
+                                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#C5A55A]/50 focus:ring-1 focus:ring-[#C5A55A]/20 transition-all resize-none"
+                                        placeholder="İşletmenizle ilgili kısa bir bilgi verin..."
+                                    />
+                                </div>
                             </div>
 
                             {error && (
