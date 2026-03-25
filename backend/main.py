@@ -16,6 +16,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 import threading
 import httpx
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # .env dosyasını yükle (şifre vb. burada)
 load_dotenv()
@@ -93,6 +96,69 @@ def check_rate_limit(request: Request):
 # Admin credentials from env
 ADMIN_USER = os.getenv("ADMIN_USER", "admin")
 ADMIN_PASS = os.getenv("ADMIN_PASS", "arslanops2024")
+
+# ─── SMTP E-posta Ayarları (Titan / GoDaddy) ───
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.titan.email")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER", "info@arslanops.com")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")  # Render'da ayarlanmalı
+NOTIFY_EMAIL = os.getenv("NOTIFY_EMAIL", "info@arslanops.com")
+
+def send_lead_notification(lead_data: dict):
+    """Yeni lead geldiğinde e-posta bildirimi gönder (arka planda)"""
+    if not SMTP_PASSWORD:
+        print("[SMTP] SMTP_PASSWORD ayarlanmamış, mail gönderilmedi.")
+        return
+    
+    try:
+        isletme_turu_map = {
+            "coffee": "Coffee Shop", "restoran": "Restoran", "kafe": "Kafe",
+            "pastane": "Pastane", "franchise": "Franchise",
+            "yeni_acilis": "Yeni Açılış", "diger": "Diğer"
+        }
+        isletme_turu = isletme_turu_map.get(lead_data.get("isletme_turu", ""), lead_data.get("isletme_turu", "-"))
+        
+        html_body = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #0B1F3B; padding: 20px; text-align: center; border-radius: 12px 12px 0 0;">
+                <h1 style="color: #C5A55A; margin: 0; font-size: 22px;">🔔 Yeni Danışmanlık Talebi</h1>
+            </div>
+            <div style="background: #f8f9fa; padding: 24px; border: 1px solid #e9ecef;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr><td style="padding: 10px 0; color: #666; width: 130px;">👤 Ad Soyad:</td>
+                        <td style="padding: 10px 0; font-weight: bold;">{lead_data.get('ad_soyad', '-')}</td></tr>
+                    <tr><td style="padding: 10px 0; color: #666;">📞 Telefon:</td>
+                        <td style="padding: 10px 0; font-weight: bold;">{lead_data.get('telefon', '-')}</td></tr>
+                    <tr><td style="padding: 10px 0; color: #666;">📧 E-posta:</td>
+                        <td style="padding: 10px 0;">{lead_data.get('email', '-') or '-'}</td></tr>
+                    <tr><td style="padding: 10px 0; color: #666;">🏢 İşletme Türü:</td>
+                        <td style="padding: 10px 0;">{isletme_turu}</td></tr>
+                    <tr><td style="padding: 10px 0; color: #666;">📍 Şehir:</td>
+                        <td style="padding: 10px 0;">{lead_data.get('sehir', '-')}</td></tr>
+                    <tr><td style="padding: 10px 0; color: #666; vertical-align: top;">💬 Mesaj:</td>
+                        <td style="padding: 10px 0;">{lead_data.get('mesaj', '-')}</td></tr>
+                </table>
+            </div>
+            <div style="background: #0B1F3B; padding: 16px; text-align: center; border-radius: 0 0 12px 12px;">
+                <p style="color: #C5A55A; margin: 0; font-size: 13px;">ArslanOps Web Sitesi • {datetime.now().strftime('%d.%m.%Y %H:%M')}</p>
+            </div>
+        </div>
+        """
+
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"🔔 Yeni Talep: {lead_data.get('ad_soyad', 'Bilinmiyor')} - {lead_data.get('sehir', '')}"
+        msg["From"] = SMTP_USER
+        msg["To"] = NOTIFY_EMAIL
+        msg.attach(MIMEText(html_body, "html", "utf-8"))
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SMTP_USER, NOTIFY_EMAIL, msg.as_string())
+        
+        print(f"[SMTP] Lead bildirimi gönderildi: {lead_data.get('ad_soyad')}")
+    except Exception as e:
+        print(f"[SMTP] Mail gönderilemedi: {e}")
 
 # Database initialization
 def init_db():
@@ -262,6 +328,15 @@ def create_lead(lead: LeadCreate, request: Request):
         ))
         conn.commit()
         lead_id = cursor.lastrowid
+        
+        # Arka planda e-posta bildirimi gönder
+        lead_dict = {
+            "ad_soyad": lead.ad_soyad, "telefon": lead.telefon,
+            "email": lead.email, "isletme_turu": lead.isletme_turu,
+            "sehir": lead.sehir, "mesaj": lead.mesaj
+        }
+        threading.Thread(target=send_lead_notification, args=(lead_dict,), daemon=True).start()
+        
         return {"success": True, "message": "Talebiniz başarıyla alındı", "id": lead_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Veritabanı hatası: {str(e)}")
