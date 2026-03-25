@@ -101,7 +101,7 @@ export default function Footer() {
                         <div className="md:col-span-1">
                             <div className="flex items-center gap-2.5 mb-4">
                                 {branding.logo_url ? (
-                                    <img src={`${API_URL}${branding.logo_url}`} alt={branding.logo_text || 'Logo'} className="h-9 w-auto" />
+                                    <img src={branding.logo_url.startsWith('http') ? branding.logo_url : `${API_URL}${branding.logo_url}`} alt={branding.logo_text || 'Logo'} className="h-9 w-auto" />
                                 ) : brandingLoaded ? (
                                     <div className="w-10 h-10 bg-gradient-to-br from-[#C5A55A] to-[#A8863D] rounded-lg flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-[#C5A55A]/20">
                                         A

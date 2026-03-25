@@ -583,6 +583,13 @@ function InputField({ label, value, onChange, placeholder, type = 'text', multil
     );
 }
 
+// ─── URL Resolver — Cloudinary URL'leri tam URL, local /uploads/ ise API_URL prefix ───
+function resolveUrl(url: string): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    return `${API_URL}${url}`;
+}
+
 // ─── File Uploader Component ───
 function FileUploader({ label, accept, currentUrl, onUpload, onRemove, category, authHeader, preview = 'image' }: {
     label: string; accept: string; currentUrl: string; onUpload: (url: string) => void;
@@ -616,11 +623,11 @@ function FileUploader({ label, accept, currentUrl, onUpload, onRemove, category,
                 <div className="relative group">
                     {preview === 'image' ? (
                         <div className="relative w-full h-48 rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
-                            <img src={`${API_URL}${currentUrl}`} alt="" className="w-full h-full object-contain" />
+                            <img src={resolveUrl(currentUrl)} alt="" className="w-full h-full object-contain" />
                         </div>
                     ) : (
                         <div className="relative w-full rounded-xl overflow-hidden border border-gray-200 bg-black">
-                            <video src={`${API_URL}${currentUrl}`} className="w-full h-48 object-contain" controls muted />
+                            <video src={resolveUrl(currentUrl)} className="w-full h-48 object-contain" controls muted />
                         </div>
                     )}
                     <div className="flex gap-2 mt-2">

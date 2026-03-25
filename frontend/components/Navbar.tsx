@@ -96,7 +96,7 @@ export default function Navbar() {
                         className="flex items-center gap-2.5 group"
                     >
                         {branding.logo_url ? (
-                            <img src={`${API_URL}${branding.logo_url}`} alt={branding.logo_text || 'Logo'} className="h-9 w-auto group-hover:scale-105 transition-transform" />
+                            <img src={branding.logo_url.startsWith('http') ? branding.logo_url : `${API_URL}${branding.logo_url}`} alt={branding.logo_text || 'Logo'} className="h-9 w-auto group-hover:scale-105 transition-transform" />
                         ) : brandingLoaded ? (
                             <div className="w-10 h-10 bg-gradient-to-br from-[#C5A55A] to-[#A8863D] rounded-lg flex items-center justify-center font-bold text-white text-lg group-hover:scale-105 transition-all shadow-lg shadow-[#C5A55A]/20">
                                 A
